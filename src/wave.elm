@@ -6,6 +6,8 @@
 
    some notion of "end"?
      but what about false starts?
+
+   store settings in localStorage (needs a port)
 -}
 
 import Browser
