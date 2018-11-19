@@ -1,3 +1,14 @@
+{- TODO
+
+   nice rendering
+   export to CSV
+     https://package.elm-lang.org/packages/elm/file/latest/File-Download
+   configure timings, 24-hour clock
+
+   some notion of "end"?
+     but what about false starts?
+-}
+
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
