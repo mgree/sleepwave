@@ -42,15 +42,27 @@ type State = Loading
            | Waving
            | GracePeriod Time.Posix -- timeEntered to restore
 
-type LogEntry = CryingStarted
+type LogEntry = Began
+              | CryingStarted
               | CryingStopped
+              | CryingSquashed
               | Waved Time.Posix -- time was due
 
+isWaved : (Time.Posix,LogEntry) -> Bool
+isWaved (_,entry) =
+    case entry of
+        Waved _ -> True
+        _ -> False
+            
+countWaves : Model -> Int
+countWaves model = List.filter isWaved model.log |> List.length
+                
 type alias Log = List (Time.Posix, LogEntry)
                 
 type alias Model = 
   { state : State
   , time : Time.Posix
+  , timeBegun : Time.Posix
   , timeEntered : Time.Posix
   , log : Log
 
@@ -67,13 +79,19 @@ log entry model = { model | log = (model.time,entry)::model.log }
 squashCryingStopped : Model -> Model
 squashCryingStopped model =
     case model.log of
-        (_, CryingStopped) :: oldLog -> { model | log = oldLog }
+        (time, CryingStopped) :: oldLog ->
+            { model | log = (time, CryingSquashed):: oldLog }
         _ -> model
-                  
+
+hasBegun : Model -> Bool
+hasBegun model = model.timeBegun /= Time.millisToPosix 0
+
+             
 init : () -> (Model, Cmd Msg)
 init _ =
   ( { state = Loading
     , time = Time.millisToPosix 0
+    , timeBegun = Time.millisToPosix 0
     , timeEntered = Time.millisToPosix 0
     , log = []            
     , zone = Time.utc
@@ -91,6 +109,7 @@ init _ =
 type Msg
   = Tick Time.Posix
   | InitializeTime Time.Zone Time.Posix
+  | Begin
   | StartWave
   | EndWave
   | ResumeWave Time.Posix
@@ -126,11 +145,17 @@ update msg model =
   case msg of
     Tick newTime -> checkTimers { model | time = newTime }
 
-    InitializeTime newZone newTime  ->
-      ( { model | state = Quiescent,
-                  time = newTime,
-                  timeEntered = newTime,
+    InitializeTime newZone newTime ->
+      ( { model | time = newTime,
                   zone = newZone }
+      , Cmd.none
+      )
+
+    Begin ->
+      ( log Began
+            { model | state = Quiescent,
+                      timeEntered = model.time,
+                      timeBegun = model.time }
       , Cmd.none
       )
 
@@ -178,7 +203,7 @@ view model =
     [ viewClock model
     , viewRemaining model
     , viewActions model
-    , viewLog model
+    , viewInfo model
     ]
 
 viewClock : Model -> Html msg
@@ -218,7 +243,9 @@ viewActions : Model -> Html Msg
 viewActions model =
     div [ class "action" ]
         (case model.state of
-              Loading -> [ text "Loading..." ]
+              Loading ->
+                  [ button [ onClick Begin ]
+                        [ text "Begin" ] ]
                    
               Quiescent ->
                   [ button [ onClick StartWave ]
@@ -239,10 +266,21 @@ viewActions model =
                   ]
         )
 
-viewLog : Model -> Html msg
-viewLog model =
-    table [ class "log" ]
-        (List.map (viewLogEntry model) model.log)
+viewInfo : Model -> Html msg
+viewInfo model =
+    div [ class "info" ]
+        (if hasBegun model
+         then [ div [ class "duration" ]
+                    [ text "You've been doing the sleep wave for "
+                    , text (millisToLongTime
+                                (timeDifference model.time model.timeBegun))
+                    ]
+              , div [ class "waves" ]
+                  [ text (countPlural (countWaves model) "wave") ]
+              , table [ class "log" ]
+                  (List.map (viewLogEntry model) model.log)
+              ]
+         else [])
 
 viewLogEntry : Model -> (Time.Posix, LogEntry) -> Html msg
 viewLogEntry model (time, entry) =
@@ -250,8 +288,10 @@ viewLogEntry model (time, entry) =
         [ td [ class "time" ] [ clockTime model.twelveHour model.zone time ]
         , td [ class "event" ]
              ( case entry of
+                   Began -> [ text "began" ]
                    CryingStarted -> [ text "crying started" ]
                    CryingStopped -> [ text "crying stopped" ]
+                   CryingSquashed -> [ s [] [ text "crying stopped" ] ]
                    Waved timeDue ->
                        [ text "completed wave due at "
                        , clockTime model.twelveHour model.zone timeDue
