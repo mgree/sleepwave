@@ -6,9 +6,7 @@ import Task
 import Time
 
 
-
 -- MAIN
-
 
 main =
   Browser.element
@@ -27,16 +25,6 @@ timeDifference timeNow timeThen =
         thenFloored = (Time.posixToMillis timeThen // 1000)
     in 1000 * abs (nowFloored - thenFloored)
 
-twoDigitInt : Int -> String
-twoDigitInt n = String.padLeft 2 '0' (String.fromInt n)
-
-countPlural : Int -> String -> String
-countPlural n thing =
-    case n of
-        0 -> ""
-        1 -> "1 " ++ thing
-        _ -> String.fromInt n ++ " " ++ thing ++ "s"
-
 -- MODEL
 
 defaultWaveTime : Int
@@ -52,24 +40,47 @@ type State = Loading
            | Quiescent
            | BetweenWaves
            | Waving
-           | GracePeriod Time.Posix
+           | GracePeriod Time.Posix -- timeEntered to restore
 
+type LogEntry = CryingStarted
+              | CryingStopped
+              | Waved Time.Posix -- time was due
+
+type alias Log = List (Time.Posix, LogEntry)
+                
 type alias Model = 
   { state : State
   , time : Time.Posix
   , timeEntered : Time.Posix
+  , log : Log
 
     -- configuration
   , zone : Time.Zone
   , waveTime : Int    -- millis
   , graceTime : Int -- millis
+  , twelveHour : Bool
   }
 
+log : LogEntry -> Model -> Model
+log entry model = { model | log = (model.time,entry)::model.log }
 
+squashCryingStopped : Model -> Model
+squashCryingStopped model =
+    case model.log of
+        (_, CryingStopped) :: oldLog -> { model | log = oldLog }
+        _ -> model
+                  
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model Loading (Time.millisToPosix 0) (Time.millisToPosix 0)
-          Time.utc testWaveTime testGracePeriod -- defaultWaveTime defaultGracePeriod
+  ( { state = Loading
+    , time = Time.millisToPosix 0
+    , timeEntered = Time.millisToPosix 0
+    , log = []            
+    , zone = Time.utc
+    , waveTime = testWaveTime -- defaultWaveTime 
+    , graceTime = testGracePeriod -- defaultGracePeriod
+    , twelveHour = True
+    }
   , Task.perform (\x -> x) (Task.map2 InitializeTime Time.here Time.now)
   )
 
@@ -96,14 +107,17 @@ checkTimers model =
         BetweenWaves ->
             if timeDifference model.time model.timeEntered >= model.waveTime
             then -- time for a wave
-                ({ model | state = Waving }
+                ({ model | state = Waving,
+                           timeEntered = model.time }
                 , Cmd.none)
             else (model, Cmd.none)
                 
         GracePeriod originalTime ->  
             if timeDifference model.time model.timeEntered >= model.graceTime
             then -- great, no need for a wave
-                ({ model | state = Quiescent }
+                ({ model | state = Quiescent,
+                           timeEntered = model.time
+                 }
                 , Cmd.none)
             else (model, Cmd.none)
             
@@ -113,39 +127,38 @@ update msg model =
     Tick newTime -> checkTimers { model | time = newTime }
 
     InitializeTime newZone newTime  ->
-      ( { model |
-              state = Quiescent,
-              time = newTime,
-              timeEntered = newTime,
-              zone = newZone }
+      ( { model | state = Quiescent,
+                  time = newTime,
+                  timeEntered = newTime,
+                  zone = newZone }
       , Cmd.none
       )
 
     StartWave ->
-      ( { model |
-              state = BetweenWaves,
-              timeEntered = model.time }
+      ( log CryingStarted
+            { model | state = BetweenWaves,
+                      timeEntered = model.time }
       , Cmd.none
       )
 
     EndWave ->
-      ( { model |
-              state = GracePeriod model.timeEntered,
-              timeEntered = model.time }
+      ( log CryingStopped
+            { model | state = GracePeriod model.timeEntered,
+                      timeEntered = model.time }
       , Cmd.none
       )
 
     ResumeWave originalTimeEntered ->
-      ( { model |
-              state = BetweenWaves,
-              timeEntered = originalTimeEntered }
+      ( squashCryingStopped
+            { model | state = BetweenWaves,
+                      timeEntered = originalTimeEntered }
       , Cmd.none
       )
 
     Wave ->
-      ( { model |
-              state = BetweenWaves,
-              timeEntered = model.time }
+      ( log (Waved model.timeEntered)
+            { model | state = BetweenWaves,
+                      timeEntered = model.time }
       , Cmd.none)
         
 
@@ -154,7 +167,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 100 Tick
+  Time.every 250 Tick
 
 
 -- VIEW
@@ -162,24 +175,17 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
   div []
-    [ viewClock model.zone model.time
+    [ viewClock model
     , viewRemaining model
     , viewActions model
+    , viewLog model
     ]
 
-viewClock : Time.Zone -> Time.Posix -> Html msg
-viewClock zone time = 
+viewClock : Model -> Html msg
+viewClock model = 
     div [ class "clock" ]
-        [ h1 [ class "clock" ] [ text (clockTime zone time) ] ]
+        [ h1 [ class "clock" ] [ clockTime model.twelveHour model.zone model.time ] ]
             
-clockTime : Time.Zone -> Time.Posix -> String
-clockTime zone time = 
-  let hour   = String.fromInt (Time.toHour   zone time)
-      minute = twoDigitInt    (Time.toMinute zone time)
-      second = twoDigitInt    (Time.toSecond zone time)
-  in
-  hour ++ ":" ++ minute ++ ":" ++ second
-
 viewRemaining : Model -> Html msg
 viewRemaining model =
   div [ class "remaining" ]
@@ -189,8 +195,8 @@ viewRemaining model =
            BetweenWaves ->
                [ div [ class "wave" ]
                      [ text "You should wave at "
-                     , text (remainingTime model.zone
-                                model.time model.timeEntered model.waveTime)]
+                     , remainingTime model model.timeEntered model.waveTime
+                     ]
                ]
            Waving ->
                [ div [ class "wave" ]
@@ -199,25 +205,15 @@ viewRemaining model =
            GracePeriod originalTimeEntered ->
                [ div [ class "resume" ]
                      [ text "If crying resumes, you should wave at "
-                     , text (remainingTime model.zone
-                                 model.time originalTimeEntered model.waveTime)
+                     , remainingTime model originalTimeEntered model.waveTime
                      ]
                , div [ class "grace" ]
                      [ text "Grace period concludes at "
-                     , text (remainingTime model.zone
-                                 model.time model.timeEntered model.graceTime)
+                     , remainingTime model model.timeEntered model.graceTime
                      ]
                ]
       )
-      
-remainingTime : Time.Zone -> Time.Posix -> Time.Posix -> Int -> String
-remainingTime zone timeNow timeStarted duration =
-    let elapsed = timeDifference timeNow timeStarted in
-    let remaining = duration - elapsed in
-    let targetTime = Time.millisToPosix (Time.posixToMillis timeNow + remaining) in
-    clockTime zone targetTime ++
-        " (" ++ millisToLongTime remaining ++ " remaining)"
-                
+
 viewActions : Model -> Html Msg
 viewActions model =
     div [ class "action" ]
@@ -239,27 +235,85 @@ viewActions model =
 
               GracePeriod originalTimeEntered ->
                   [ button [ onClick (ResumeWave originalTimeEntered) ]
-                        [ text "Restart wave" ]
+                        [ text "Crying restarted" ]
                   ]
         )
+
+viewLog : Model -> Html msg
+viewLog model =
+    table [ class "log" ]
+        (List.map (viewLogEntry model) model.log)
+
+viewLogEntry : Model -> (Time.Posix, LogEntry) -> Html msg
+viewLogEntry model (time, entry) =
+    tr [ class "entry" ]
+        [ td [ class "time" ] [ clockTime model.twelveHour model.zone time ]
+        , td [ class "event" ]
+             ( case entry of
+                   CryingStarted -> [ text "crying started" ]
+                   CryingStopped -> [ text "crying stopped" ]
+                   Waved timeDue ->
+                       [ text "completed wave due at "
+                       , clockTime model.twelveHour model.zone timeDue
+                       ]
+             )
+        ]
+              
         
+        
+clockTime : Bool -> Time.Zone -> Time.Posix -> Html msg
+clockTime twelveHour zone time = 
+  let baseHour  = Time.toHour zone time
+      hour      = String.fromInt (if twelveHour then modBy 12 baseHour else baseHour)
+      minute    = twoDigitInt    (Time.toMinute zone time)
+      second    = twoDigitInt    (Time.toSecond zone time)
+      ampm      = if twelveHour
+                  then if baseHour > 12
+                       then "pm"
+                       else "am"
+                  else ""
+  in
+  text (hour ++ ":" ++ minute ++ ":" ++ second ++ ampm)
+
+      
+remainingTime : Model -> Time.Posix -> Int -> Html msg
+remainingTime model timeStarted duration =
+    let elapsed    = timeDifference model.time timeStarted
+        remaining  = duration - elapsed
+        targetTime = Time.posixToMillis model.time + remaining
+                                   |> Time.millisToPosix
+    in
+    span []
+        [ clockTime model.twelveHour model.zone targetTime
+        , text (" (" ++ millisToLongTime remaining ++ " remaining)")
+        ]
+                        
 millisToLongTime : Int -> String
 millisToLongTime millis =
     let (hours, minutes, seconds) = millisToHMS millis in
     let strs = [ countPlural hours "hour"
                , countPlural minutes "minute"
                , countPlural seconds "second"
-               ] in
+               ]
+    in
     List.filter (not << String.isEmpty) strs |> String.join " "
         
 millisToShortTime : Int -> String
 millisToShortTime millis =
     let (hours, minutes, seconds) = millisToHMS millis in
-    (if hours > 0 then String.fromInt hours ++ ":" else "") ++
-    (if minutes > 0
-     then (if hours > 0 then twoDigitInt minutes else String.fromInt minutes) ++ ":"
-     else "") ++
-    (if minutes > 0 then twoDigitInt seconds else String.fromInt seconds)
+    let strs = [ if hours > 0 then String.fromInt hours ++ ":" else ""
+               , if hours > 0
+                 then twoDigitInt minutes
+                 else if minutes > 0
+                      then String.fromInt minutes
+                      else ""
+               , if hours > 0 || minutes > 0
+                 then twoDigitInt seconds
+                 else String.fromInt seconds
+               ]
+    in
+    List.filter (not << String.isEmpty) strs |> String.join ":"
+
 
 millisToHMS : Int -> (Int, Int, Int)
 millisToHMS millis =              
@@ -269,8 +323,13 @@ millisToHMS millis =
     let minutes = modBy 60 totalMinutes in
     let hours = totalMinutes // 60 in
     (hours, minutes, seconds)
-        
-viewInput : String -> String -> String -> (String -> msg) -> Html msg
-viewInput t p v toMsg =
-  input [ type_ t, placeholder p, value v, onInput toMsg ] []
-         
+
+twoDigitInt : Int -> String
+twoDigitInt n = String.padLeft 2 '0' (String.fromInt n)
+
+countPlural : Int -> String -> String
+countPlural n thing =
+    case n of
+        0 -> ""
+        1 -> "1 " ++ thing
+        _ -> String.fromInt n ++ " " ++ thing ++ "s"
