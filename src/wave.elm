@@ -44,11 +44,8 @@ timeDifference timeNow timeThen =
 defaultWaveTime : Int
 defaultWaveTime = 1000 * 60 * 5 -- 5min wave time
 
-defaultGracePeriod : Int
-defaultGracePeriod =  1000 * 30 -- 30sec grace period
-
-testWaveTime = 1000 * 15
-testGraceTime = 1000 * 5
+defaultGraceTime : Int
+defaultGraceTime =  1000 * 30 -- 30sec grace period
                       
 type State = Loading
            | Quiescent
@@ -124,8 +121,8 @@ hasBegun model = model.timeBegun /= Time.millisToPosix 0
 initConfig : Config
 initConfig =
     { zone = Time.utc
-    , waveTime = testWaveTime -- defaultWaveTime 
-    , graceTime = testGraceTime -- defaultGraceTime
+    , waveTime = defaultWaveTime 
+    , graceTime = defaultGraceTime
     , twelveHour = True
     }
                  
