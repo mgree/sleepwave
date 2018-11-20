@@ -7,6 +7,8 @@
    some notion of "end"?
      but what about false starts?
 
+   change from checkbox to radio boxes
+
    store settings in localStorage (needs a port)
 -}
 
@@ -78,6 +80,10 @@ type alias Config =
   , waveTime : Int    -- millis
   , graceTime : Int -- millis
   , twelveHour : Bool
+
+  -- for updates
+  , enteredWaveTime : String
+  , enteredGraceTime : String
   }
 
 setZone : Time.Zone -> Config -> Config
@@ -85,18 +91,28 @@ setZone newZone config = { config | zone = newZone }
 
 setTwelveHour : Bool -> Config -> Config
 setTwelveHour newTwelveHour config = { config | twelveHour = newTwelveHour }
-
-trySetTime : String -> (Int -> Config -> Config) -> Config -> Config
-trySetTime str setter config =
-    case tryHMSToMillis str of
-        Nothing -> config
-        Just newValue -> setter newValue config
                                      
-setWaveTime : Int -> Config -> Config
-setWaveTime newWaveTime config = { config | waveTime = newWaveTime }
+updateWaveTime : String -> Config -> Config
+updateWaveTime entered config = { config | enteredWaveTime = entered }
+                             
+updateGraceTime : String -> Config -> Config
+updateGraceTime entered config = { config | enteredGraceTime = entered }
 
-setGraceTime : Int -> Config -> Config
-setGraceTime newGraceTime config = { config | graceTime = newGraceTime }
+trySetWaveTime : Config -> Config
+trySetWaveTime config =
+    case tryHMSToMillis config.enteredWaveTime of
+        Nothing -> config
+        Just new -> { config |
+                          waveTime = new,
+                          enteredWaveTime = millisToShortTime new }
+
+trySetGraceTime : Config -> Config
+trySetGraceTime config =
+    case tryHMSToMillis config.enteredGraceTime of
+        Nothing -> config
+        Just new -> { config |
+                          graceTime = new,
+                          enteredGraceTime = millisToShortTime new }
 
 type alias Model = 
   { state : State
@@ -126,6 +142,8 @@ initConfig =
     , waveTime = defaultWaveTime 
     , graceTime = defaultGraceTime
     , twelveHour = True
+    , enteredWaveTime = millisToShortTime defaultWaveTime
+    , enteredGraceTime = millisToShortTime defaultGraceTime
     }
                  
 init : () -> (Model, Cmd Msg)
@@ -134,7 +152,7 @@ init _ =
     , time = Time.millisToPosix 0
     , timeBegun = Time.millisToPosix 0
     , timeEntered = Time.millisToPosix 0
-    , log = []            
+    , log = []
     , config = initConfig
     }
   , Task.perform (\x -> x) (Task.map2 InitializeTime Time.here Time.now)
@@ -152,8 +170,10 @@ type Msg
   | EndWave
   | ResumeWave Time.Posix
   | Wave
-  | ConfigSetWaveTime String
-  | ConfigSetGraceTime String
+  | ConfigUpdateWaveTime String
+  | ConfigUpdateGraceTime String
+  | ConfigSetWaveTime
+  | ConfigSetGraceTime
   | ConfigSetTwelveHour Bool
 
 checkTimers : Model -> (Model, Cmd Msg)
@@ -231,12 +251,20 @@ update msg model =
       ( { model | config = setTwelveHour newTwelveHour model.config }
       , Cmd.none)
 
-    ConfigSetWaveTime newWaveTime ->
-      ( { model | config = trySetTime newWaveTime setWaveTime model.config }
+    ConfigUpdateWaveTime newWaveTime ->
+      ( { model | config = updateWaveTime newWaveTime model.config }
       , Cmd.none)
         
-    ConfigSetGraceTime newGraceTime ->
-      ( { model | config = trySetTime newGraceTime setGraceTime model.config }
+    ConfigUpdateGraceTime newGraceTime ->
+      ( { model | config = updateGraceTime newGraceTime model.config }
+      , Cmd.none)
+
+    ConfigSetWaveTime ->
+      ( { model | config = trySetWaveTime model.config }
+      , Cmd.none)
+
+    ConfigSetGraceTime ->
+      ( { model | config = trySetGraceTime model.config }
       , Cmd.none)
 
 -- SUBSCRIPTIONS
@@ -251,28 +279,29 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  div []
-    [ viewClock model
-    , viewRemaining model
-    , viewActions model
-    , viewInfo model
-    , Html.Lazy.lazy viewConfig model.config
+  div [ class "container" ]
+    [ row "clock" <| viewClock model
+    , row "remaining" <| viewRemaining model
+    , row "actions"  <| viewActions model
+    , row "info" <| viewInfo model
+    , Html.Lazy.lazy (viewConfig >> row "config") model.config
     ]
 
 viewClock : Model -> Html msg
-viewClock model = 
-    div [ class "clock" ]
-        [ h1 [ class "clock" ] [ clockTime model.config model.time ] ]
+viewClock model =
+    h1 [ class "clock"
+       , centered ]
+       [ clockTime model.config model.time ]
             
 viewRemaining : Model -> Html msg
 viewRemaining model =
-  div [ class "remaining" ]
+  div [ centered ]
       (case model.state of
            Loading -> []
            Quiescent -> []
            BetweenWaves ->
                [ div [ class "wave" ]
-                     [ text "You should wave at "
+                     [ span [] [ text "next wave at " ]
                      , remainingTime model model.timeEntered model.config.waveTime
                      ]
                ]
@@ -294,54 +323,59 @@ viewRemaining model =
 
 viewActions : Model -> Html Msg
 viewActions model =
-    div [ class "action" ]
-        (case model.state of
-              Loading ->
-                  [ button [ onClick Begin ]
-                        [ text "Begin" ] ]
-                   
-              Quiescent ->
-                  [ button [ onClick StartWave ]
-                        [ text "Crying started" ] ]
-              
-              BetweenWaves ->
-                  [ button [ onClick EndWave ]
-                        [ text "Crying stopped" ] ]
+    let actionClass handler = [ centered, handler ] in
+    case model.state of
+        Loading ->
+            button (actionClass (onClick Begin)) [ text "Begin" ]
              
-              Waving ->
-                  [ button [ onClick Wave ]
-                      [ text "I waved" ]
-                  ]
+        Quiescent ->
+            button (actionClass (onClick StartWave)) [ text "Crying started" ]
+        
+        BetweenWaves ->
+            button (actionClass (onClick EndWave)) [ text "Crying stopped" ]
+        
+        Waving ->
+            button (actionClass (onClick Wave)) [ text "I waved" ]
 
-              GracePeriod originalTimeEntered ->
-                  [ button [ onClick (ResumeWave originalTimeEntered) ]
-                        [ text "Crying restarted" ]
-                  ]
-        )
+        GracePeriod originalTimeEntered ->
+            button (actionClass (onClick (ResumeWave originalTimeEntered)))
+                [ text "Crying restarted" ]
+            
 
 viewInfo : Model -> Html msg
 viewInfo model =
-    div [ class "info" ]
+    div [ ]
         (if hasBegun model
-         then [ div [ class "duration" ]
+         then [ rowLabel "Information"
+              , div [ class "duration two columns offset-by-two" ]
                     [ text "You've been doing the sleep wave for "
                     , text (millisToLongTime
                                 (timeDifference model.time model.timeBegun))
+                    , text "."
                     ]
               , Html.Lazy.lazy viewWaveCount (countWaves model)
               , Html.Lazy.lazy2 viewLog model.config model.log
               ]
-         else [])
+         else [ ])
 
 viewWaveCount : Int -> Html msg
 viewWaveCount numWaves =
-    div [ class "waves" ]
-        [ text (countPlural numWaves "wave") ]
+    div [ class "waves two columns" ]
+        [ if numWaves == 0
+          then text "0 waves"
+          else text (countPlural numWaves "wave") ]
 
 viewLog : Config -> Log -> Html msg
 viewLog config log =
-    table [ class "log" ]
-        (List.map (viewLogEntry config) log)
+    table [ class "log two columns" ]
+        [ thead []
+              [ tr []
+                    [ td [] [ text "Time" ]
+                    , td [] [ text "Event" ] ]
+              ]
+        , tbody []
+            (List.map (viewLogEntry config) log)
+        ]
             
 viewLogEntry : Config -> (Time.Posix, LogEntry) -> Html msg
 viewLogEntry config (time, entry) =
@@ -363,40 +397,54 @@ viewLogEntry config (time, entry) =
 
 viewConfig : Config -> Html Msg
 viewConfig config =
-    div [ class "config" ]
-        [ timeField config .waveTime "Wave duration" ConfigSetWaveTime
-        , timeField config .graceTime "Grace period" ConfigSetGraceTime
-        , label [] [ text "Use 12-hour clock (am/pm)"
-                   , input [ type_ "checkbox"
-                           , checked config.twelveHour
-                           , onCheck ConfigSetTwelveHour
-                           ]
-                         []
-                   ]
+    div [ ]
+        [ rowLabel "Settings"
+        , div [ class "two columns offset-by-two" ]
+            (timeInput config .enteredWaveTime .waveTime
+                 "config-wave-duration" "Wave duration"
+                 ConfigUpdateWaveTime ConfigSetWaveTime)
+        , div [ class "two columns" ]
+            (timeInput config .enteredGraceTime .graceTime
+                 "config-grace-time" "Grace period"
+                 ConfigUpdateGraceTime ConfigSetGraceTime)
+        , div [ class "two columns" ]
+            [ label [ for "config-twelve-hour" ]
+                  [ text "Use 12-hour clock (am/pm)" ]
+            , input [ id "config-twelve-hour"
+                    , type_ "checkbox"
+                    , checked config.twelveHour
+                    , onCheck ConfigSetTwelveHour
+                    ]
+                  []
+            ]
         ]
 
-timeField : Config -> (Config -> Int) -> String -> (String -> Msg) -> Html Msg
-timeField config getter labelText msg =
-    label [] [ text labelText
-             , input
-                   [ type_ "text"
-                   , value (millisToShortTime (getter config))
-                   , onEnterValue msg
-                   , onBlurValue msg
-                   ]
-                   []
-             ]
-
-onBlurValue : (String -> msg) -> Attribute msg
-onBlurValue msg =
-  on "blur" (Json.map msg targetValue)
+timeInput : Config -> (Config -> String) -> (Config -> Int) -> String -> String -> (String -> Msg) -> Msg -> List (Html Msg)
+timeInput config entered actual inputId labelText updateMsg setMsg =
+    let inSync = (entered config) == millisToShortTime (actual config) in
+    let valid = isValidHMS (entered config) in
+    [ label [ for inputId ] [ text (labelText ++ " ") ]
+    , input [ type_ "text"
+            , value (entered config)
+            , onInput updateMsg
+            , onEnter setMsg
+            , onBlur setMsg
+            , id inputId
+            , class (if valid
+                     then if inSync
+                          then "valid"
+                          else "outofdate"
+                     else "invalid")
+            ]
+          []
+    ]
         
-onEnterValue : (String -> msg) -> Attribute msg
-onEnterValue msg =
+onEnter : msg -> Attribute msg
+onEnter msg =
   let isEnter code = if code == 13 then Json.succeed "" else Json.fail ""
       decodeEnter = Json.andThen isEnter keyCode
   in
-      on "keypress" (Json.map2 (\key value -> msg value) decodeEnter targetValue)
+      on "keypress" (Json.map (\key -> msg) decodeEnter)
         
 clockTime : Config -> Time.Posix -> Html msg
 clockTime config time = 
@@ -413,7 +461,6 @@ clockTime config time =
                   else ""
   in
   text (hour ++ ":" ++ minute ++ ":" ++ second ++ ampm)
-
       
 remainingTime : Model -> Time.Posix -> Int -> Html msg
 remainingTime model timeStarted duration =
@@ -422,9 +469,11 @@ remainingTime model timeStarted duration =
         targetTime = Time.posixToMillis model.time + remaining
                                    |> Time.millisToPosix
     in
-    span []
-        [ clockTime model.config targetTime
-        , text (" (" ++ millisToLongTime remaining ++ " remaining)")
+    a [ class "remaining" ]
+        [ h1 []
+              [ clockTime model.config targetTime
+              , text (" (" ++ millisToLongTime remaining ++ " remaining)")
+              ]
         ]
                         
 millisToLongTime : Int -> String
@@ -473,6 +522,17 @@ countPlural n thing =
         1 -> "1 " ++ thing
         _ -> String.fromInt n ++ " " ++ thing ++ "s"
 
+-- skeleton wrapper
+
+row : String -> Html msg -> Html msg
+row cls cts = div [ class "row", class cls ] [ cts ]
+
+rowLabel : String -> Html msg
+rowLabel lbl = h5 [ class "one column"] [ text lbl ]
+              
+centered : Attribute msg
+centered = class "six columns offset-by-three"
+
 -- H:M:S parser             
 
 tryHMSToMillis : String -> Maybe Int
@@ -481,6 +541,12 @@ tryHMSToMillis str =
         Err _ -> Nothing
         Ok (h,m,s) -> Just (1000 * (s + 60 * (m + 60 * h)))
 
+isValidHMS : String -> Bool
+isValidHMS str =
+    case Parser.run parseHMS str of
+        Err _ -> False
+        Ok (h,m,s) -> True
+                      
 parseHMS : Parser (Int,Int,Int)
 parseHMS =
     succeed (\i1 mi23 ->
