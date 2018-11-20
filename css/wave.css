@@ -32,17 +32,47 @@ input.outofdate, input.outofdate:focus {
     text-align: center;
 }
 
+.target {
+    margin-bottom: 0px;
+}
+
+div.row.actions {
+    margin-bottom: 4rem;
+}
+
 div.row.config {
     border-top: 1px white solid;
     margin-top: 1rem;
     padding-top: 1rem;
 }
 
+div.next-wave {
+    color: #aaf;
+}
+
+div.resume {
+    color: #55c;
+}
+
 div.row.remaining {
     text-align: center;
 }
 
-input.config-twelve-hour { float: right; }
+a.remaining {
+    color: #aaf;
+}
+
+div.grace {
+    color: #8b8;
+}
+
+div.row.actions button {
+    /* copied from h2 skeleton.css */
+    font-weight: 300;
+    font-size: 3.6rem; line-height: 1.25; letter-spacing: -.1rem;
+    height: 100%;
+    padding: 0px;
+}
 
 table.log thead {
     font-style: italic;
