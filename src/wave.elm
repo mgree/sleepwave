@@ -64,6 +64,17 @@ type LogEntry = Began
               | Waved Time.Posix -- time was due
               | Debug String
 
+type RemainingMode = ClockAndTimeLeft
+                   | ClockOnly
+                   | TimeLeftOnly
+
+nextRemainingMode : RemainingMode -> RemainingMode
+nextRemainingMode mode =
+    case mode of
+        ClockAndTimeLeft -> ClockOnly
+        ClockOnly -> TimeLeftOnly
+        TimeLeftOnly -> ClockAndTimeLeft
+                     
 isWaved : (Time.Posix,LogEntry) -> Bool
 isWaved (_,entry) =
     case entry of
@@ -80,6 +91,7 @@ type alias Config =
   , waveTime : Int    -- millis
   , graceTime : Int -- millis
   , twelveHour : Bool
+  , remainingMode : RemainingMode
 
   -- for updates
   , enteredWaveTime : String
@@ -114,6 +126,10 @@ trySetGraceTime config =
                           graceTime = new,
                           enteredGraceTime = millisToShortTime new }
 
+cycleRemainingMode : Config -> Config
+cycleRemainingMode config =
+    { config | remainingMode = nextRemainingMode config.remainingMode }
+                    
 type alias Model = 
   { state : State
   , time : Time.Posix
@@ -142,6 +158,7 @@ initConfig =
     , waveTime = defaultWaveTime 
     , graceTime = defaultGraceTime
     , twelveHour = True
+    , remainingMode = ClockAndTimeLeft
     , enteredWaveTime = millisToShortTime defaultWaveTime
     , enteredGraceTime = millisToShortTime defaultGraceTime
     }
@@ -175,6 +192,7 @@ type Msg
   | ConfigSetWaveTime
   | ConfigSetGraceTime
   | ConfigSetTwelveHour Bool
+  | ConfigCycleRemaining
 
 checkTimers : Model -> (Model, Cmd Msg)
 checkTimers model =
@@ -209,48 +227,43 @@ update msg model =
     InitializeTime newZone newTime ->
       ( { model | time = newTime,
                   config = setZone newZone model.config }
-      , Cmd.none
-      )
+      , Cmd.none)
 
     Begin ->
       ( logEntry Began
             { model | state = Quiescent,
                       timeEntered = model.time,
                       timeBegun = model.time }
-      , Cmd.none
-      )
+      , Cmd.none)
 
     StartWave ->
       ( logEntry CryingStarted
             { model | state = BetweenWaves,
                       timeEntered = model.time }
-      , Cmd.none
-      )
+      , Cmd.none)
 
     EndWave ->
       ( logEntry CryingStopped
             { model | state = GracePeriod model.timeEntered,
                       timeEntered = model.time }
-      , Cmd.none
-      )
+      , Cmd.none)
 
     ResumeWave originalTimeEntered ->
       ( squashCryingStopped
             { model | state = BetweenWaves,
                       timeEntered = originalTimeEntered }
-      , Cmd.none
-      )
+      , Cmd.none)
 
     Wave ->
       ( logEntry (Waved model.timeEntered)
             { model | state = BetweenWaves,
                       timeEntered = model.time }
       , Cmd.none)
-
+        
     ConfigSetTwelveHour newTwelveHour ->
       ( { model | config = setTwelveHour newTwelveHour model.config }
       , Cmd.none)
-
+        
     ConfigUpdateWaveTime newWaveTime ->
       ( { model | config = updateWaveTime newWaveTime model.config }
       , Cmd.none)
@@ -258,13 +271,17 @@ update msg model =
     ConfigUpdateGraceTime newGraceTime ->
       ( { model | config = updateGraceTime newGraceTime model.config }
       , Cmd.none)
-
+        
     ConfigSetWaveTime ->
       ( { model | config = trySetWaveTime model.config }
       , Cmd.none)
 
     ConfigSetGraceTime ->
       ( { model | config = trySetGraceTime model.config }
+      , Cmd.none)
+
+    ConfigCycleRemaining ->
+      ( { model | config = cycleRemainingMode model.config }
       , Cmd.none)
 
 -- SUBSCRIPTIONS
@@ -284,6 +301,8 @@ view model =
     , row "remaining" <| viewRemaining model
     , row "actions"  <| viewActions model
     , row "info" <| viewInfo model
+    , Html.Lazy.lazy2 (\cfg lg -> viewLog cfg lg |> row "log")
+        model.config model.log
     , Html.Lazy.lazy (viewConfig >> row "config") model.config
     ]
 
@@ -293,55 +312,85 @@ viewClock model =
        , centered ]
        [ clockTime model.config model.time ]
             
-viewRemaining : Model -> Html msg
+viewRemaining : Model -> Html Msg
 viewRemaining model =
-  div [ centered ]
-      (case model.state of
-           Loading -> []
-           Quiescent -> []
-           BetweenWaves ->
-               [ div [ class "wave" ]
-                     [ span [] [ text "next wave at " ]
-                     , remainingTime model model.timeEntered model.config.waveTime
-                     ]
-               ]
-           Waving ->
-               [ div [ class "wave" ]
-                     [ text "Time for a wave!" ]
-               ]
-           GracePeriod originalTimeEntered ->
+    let computed = computeTimeLeft model model.timeEntered model.config.waveTime in
+    div [ class "ten columns offset-by-one" ]
+        (case model.state of
+             Loading -> []
+             Quiescent -> []
+             BetweenWaves ->
+                 [ div [ class "next-wave" ]
+                       [ remainingTime model.config computed ]
+                 ]
+             Waving ->
+                 [ h1 [ class "wave" ]
+                      [ text "time for a visit" ]
+                 ]
+             GracePeriod originalTimeEntered ->
                [ div [ class "resume" ]
-                     [ text "If crying resumes, you should wave at "
-                     , remainingTime model originalTimeEntered model.config.waveTime
+                     [ remainingTime model.config computed
                      ]
                , div [ class "grace" ]
-                     [ text "Grace period concludes at "
-                     , remainingTime model model.timeEntered model.config.graceTime
+                     [ timeLeft (computeTimeLeft model
+                                     model.timeEntered model.config.graceTime)
+                           "left in grace period"
                      ]
                ]
       )
 
+remainingTime : Config -> (Int, Time.Posix) -> Html Msg
+remainingTime config computed =
+    let clock = targetTimeClock config computed
+        lbl   = span [] [ text "next wave" ]
+        left  = timeLeft computed ""
+    in
+        div [ class "remaining"
+            , onClick ConfigCycleRemaining
+            ]
+            (case config.remainingMode of
+                 ClockAndTimeLeft -> [ lbl, clock, left ]
+                 ClockOnly        -> [ lbl, clock ]
+                 TimeLeftOnly     -> [ lbl,        left ])
+
+timeLeft : (Int, Time.Posix) -> String -> Html msg
+timeLeft (remaining, targetTime) msg =
+    h4 [class "timeleft"]
+        [ text ("" ++ millisToLongTime remaining ++ " " ++ msg)
+        ]
+        
+targetTimeClock : Config -> (Int, Time.Posix) -> Html msg
+targetTimeClock config (remaining, targetTime) =
+    h1 [class "target"] [ clockTime config targetTime ]
+        
+computeTimeLeft : Model -> Time.Posix -> Int -> (Int, Time.Posix)
+computeTimeLeft model timeStarted duration =
+    let elapsed    = timeDifference model.time timeStarted
+        remaining  = duration - elapsed
+        targetTime = Time.posixToMillis model.time + remaining |> Time.millisToPosix
+    in
+        (remaining, targetTime)
+        
 viewActions : Model -> Html Msg
 viewActions model =
     let actionClass handler = [ centered, handler ] in
     case model.state of
         Loading ->
-            button (actionClass (onClick Begin)) [ text "Begin" ]
+            button (actionClass (onClick Begin)) [ text "begin" ]
              
         Quiescent ->
-            button (actionClass (onClick StartWave)) [ text "Crying started" ]
+            button (actionClass (onClick StartWave)) [ text "crying started" ]
         
         BetweenWaves ->
-            button (actionClass (onClick EndWave)) [ text "Crying stopped" ]
+            button (actionClass (onClick EndWave)) [ text "crying stopped" ]
         
         Waving ->
-            button (actionClass (onClick Wave)) [ text "I waved" ]
+            button (actionClass (onClick Wave)) [ text "i waved" ]
 
         GracePeriod originalTimeEntered ->
             button (actionClass (onClick (ResumeWave originalTimeEntered)))
-                [ text "Crying restarted" ]
-            
-
+                [ text "crying restarted" ]
+                    
 viewInfo : Model -> Html msg
 viewInfo model =
     div [ ]
@@ -354,7 +403,6 @@ viewInfo model =
                     , text "."
                     ]
               , Html.Lazy.lazy viewWaveCount (countWaves model)
-              , Html.Lazy.lazy2 viewLog model.config model.log
               ]
          else [ ])
 
@@ -367,15 +415,18 @@ viewWaveCount numWaves =
 
 viewLog : Config -> Log -> Html msg
 viewLog config log =
-    table [ class "log two columns" ]
-        [ thead []
-              [ tr []
-                    [ td [] [ text "Time" ]
-                    , td [] [ text "Event" ] ]
-              ]
-        , tbody []
-            (List.map (viewLogEntry config) log)
-        ]
+    table [ class "log ten columns offset-by-one" ]
+        (if List.isEmpty log
+         then []
+         else
+             [ thead []
+                   [ tr []
+                         [ td [] [ text "Time" ]
+                         , td [] [ text "Event" ] ]
+                   ]
+             , tbody []
+                 (List.map (viewLogEntry config) log)
+             ])
             
 viewLogEntry : Config -> (Time.Posix, LogEntry) -> Html msg
 viewLogEntry config (time, entry) =
@@ -461,20 +512,6 @@ clockTime config time =
                   else ""
   in
   text (hour ++ ":" ++ minute ++ ":" ++ second ++ ampm)
-      
-remainingTime : Model -> Time.Posix -> Int -> Html msg
-remainingTime model timeStarted duration =
-    let elapsed    = timeDifference model.time timeStarted
-        remaining  = duration - elapsed
-        targetTime = Time.posixToMillis model.time + remaining
-                                   |> Time.millisToPosix
-    in
-    a [ class "remaining" ]
-        [ h1 []
-              [ clockTime model.config targetTime
-              , text (" (" ++ millisToLongTime remaining ++ " remaining)")
-              ]
-        ]
                         
 millisToLongTime : Int -> String
 millisToLongTime millis =
