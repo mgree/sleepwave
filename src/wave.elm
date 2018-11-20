@@ -3,8 +3,6 @@
    some notion of "end"?
      but what about false starts?
 
-   change from checkbox to radio boxes
-
    store settings in localStorage (needs a port)
 -}
 
@@ -465,23 +463,37 @@ viewConfig : Config -> Html Msg
 viewConfig config =
     div [ ]
         [ rowLabel "Settings"
-        , div [ class "two columns offset-by-two" ]
+        , div [ class "two columns offset-by-one" ]
             (timeInput config .enteredWaveTime .waveTime
-                 "config-wave-duration" "Wave duration"
+                 "config-wave-duration" "Wave duration (H:M:S)"
                  ConfigUpdateWaveTime ConfigSetWaveTime)
         , div [ class "two columns" ]
             (timeInput config .enteredGraceTime .graceTime
-                 "config-grace-time" "Grace period"
+                 "config-grace-time" "Grace period (H:M:S)"
                  ConfigUpdateGraceTime ConfigSetGraceTime)
-        , div [ class "two columns" ]
-            [ label [ for "config-twelve-hour" ]
-                  [ text "Use 12-hour clock (am/pm)" ]
-            , input [ id "config-twelve-hour"
-                    , type_ "checkbox"
-                    , checked config.twelveHour
-                    , onCheck ConfigSetTwelveHour
-                    ]
-                  []
+        , div [ class "three columns", id "config-twelve-hour" ]
+            [ div []
+                  [ input [ id "config-twelve-hour12"
+                          , name "config-twelve-hour"
+                          , type_ "radio"
+                          , checked config.twelveHour
+                          , onCheck ConfigSetTwelveHour
+                          ]
+                        []
+                  , label [ for "config-twelve-hour12" ]
+                      [ text "12-hour clock (am/pm)" ]
+                  ]
+            , div []
+                  [ input [ id "config-twelve-hour24"
+                          , name "config-twelve-hour"
+                          , type_ "radio"
+                          , checked (not config.twelveHour)
+                          , onCheck (not >> ConfigSetTwelveHour)
+                          ]
+                        []
+                  , label [ for "config-twelve-hour24" ]
+                      [ text "24-hour clock" ]
+                  ]
             ]
         ]
 

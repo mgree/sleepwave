@@ -5,7 +5,7 @@ body {
     color: white;
 }
 
-.container input {
+.container input[type="text"] {
     background-color: black;
     text-align: right;
     width: 100%;
@@ -17,6 +17,11 @@ input.invalid, input.invalid:focus {
 
 input.outofdate, input.outofdate:focus {
     border: 1px solid #b8a;
+}
+
+div#config-twelve-hour label {
+    display: inline;
+    padding-left: 1rem;
 }
 
 .container button {
