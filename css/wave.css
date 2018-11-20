@@ -1,0 +1,67 @@
+/* restyling */
+
+body {
+    background-color: black;
+    color: white;
+}
+
+.container input {
+    background-color: black;
+    text-align: right;
+    width: 100%;
+}
+
+input.invalid, input.invalid:focus {
+    border: 1px solid #b00;
+}
+
+input.outofdate, input.outofdate:focus {
+    border: 1px solid #b8a;
+}
+
+.container button {
+    color: #eee;
+}
+
+.boxed {
+    background-color: #eee;
+    border-radius: 3rem;
+}
+
+.clock {
+    text-align: center;
+}
+
+div.row.config {
+    border-top: 1px white solid;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+div.row.remaining {
+    text-align: center;
+}
+
+input.config-twelve-hour { float: right; }
+
+table.log thead {
+    font-style: italic;
+}
+
+table.log {
+    width: 100%;
+}
+
+/* utility classes */
+
+.u-clear-bottom {
+    margin-bottom: 3rem;
+}
+
+.u-clear-bottom-short {
+    margin-bottom: 1rem;
+}
+
+.u-center {
+    text-align: center;
+}
