@@ -1,6 +1,5 @@
 {- TODO
 
-   nice rendering
    export to CSV
      https://package.elm-lang.org/packages/elm/file/latest/File-Download
 
