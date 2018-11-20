@@ -1,8 +1,5 @@
 {- TODO
 
-   export to CSV
-     https://package.elm-lang.org/packages/elm/file/latest/File-Download
-
    some notion of "end"?
      but what about false starts?
 
@@ -19,6 +16,7 @@ import Html.Lazy
 import Task
 import Time
 import Json.Decode as Json
+import File.Download
 
 import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 
@@ -186,6 +184,7 @@ type Msg
   | EndWave
   | ResumeWave Time.Posix
   | Wave
+  | DownloadLog
   | ConfigUpdateWaveTime String
   | ConfigUpdateGraceTime String
   | ConfigSetWaveTime
@@ -258,6 +257,12 @@ update msg model =
             { model | state = BetweenWaves,
                       timeEntered = model.time }
       , Cmd.none)
+
+    DownloadLog ->
+      ( model
+      , let now = clockTime model.config model.time in
+        let filename = "sleep-" ++ now ++ ".csv" in
+        File.Download.string filename "text/csv" (logToCSV model.config model.log))
         
     ConfigSetTwelveHour newTwelveHour ->
       ( { model | config = setTwelveHour newTwelveHour model.config }
@@ -300,8 +305,7 @@ view model =
     , row "remaining" <| viewRemaining model
     , row "actions"  <| viewActions model
     , row "info" <| viewInfo model
-    , Html.Lazy.lazy2 (\cfg lg -> viewLog cfg lg |> row "log")
-        model.config model.log
+    , Html.Lazy.lazy2 viewLog model.config model.log
     , Html.Lazy.lazy (viewConfig >> row "config") model.config
     ]
 
@@ -309,7 +313,7 @@ viewClock : Model -> Html msg
 viewClock model =
     h1 [ class "clock"
        , centered ]
-       [ clockTime model.config model.time ]
+       [ text (clockTime model.config model.time) ]
             
 viewRemaining : Model -> Html Msg
 viewRemaining model =
@@ -360,7 +364,7 @@ timeLeft (remaining, targetTime) msg =
         
 targetTimeClock : Config -> (Int, Time.Posix) -> Html msg
 targetTimeClock config (remaining, targetTime) =
-    h1 [class "target"] [ clockTime config targetTime ]
+    h1 [class "target"] [ text (clockTime config targetTime) ]
         
 computeTimeLeft : Model -> Time.Posix -> Int -> (Int, Time.Posix)
 computeTimeLeft model timeStarted duration =
@@ -412,25 +416,37 @@ viewWaveCount numWaves =
           then text "0 waves"
           else text (countPlural numWaves "wave") ]
 
-viewLog : Config -> Log -> Html msg
+viewLog : Config -> Log -> Html Msg
 viewLog config log =
-    table [ class "log ten columns offset-by-one" ]
-        (if List.isEmpty log
-         then []
-         else
-             [ thead []
-                   [ tr []
-                         [ td [] [ text "Time" ]
-                         , td [] [ text "Event" ] ]
+    div []
+        [ row "log" <|
+              table [ class "log ten columns offset-by-one" ]
+              (if List.isEmpty log
+               then []
+               else
+                   [ thead []
+                         [ tr []
+                               [ td [] [ text "Time" ]
+                               , td [] [ text "Event" ] ]
+                         ]
+                   , tbody [] (List.map (viewLogEntry config) log)
                    ]
-             , tbody []
-                 (List.map (viewLogEntry config) log)
-             ])
+              )
+        , row "log-download" <|
+            if List.isEmpty log
+            then span [] []
+            else button [ class "three columns offset-by-eight"
+                        , onClick DownloadLog
+                        ]
+                    [ text "download log " ]
+        ]
+            
+
             
 viewLogEntry : Config -> (Time.Posix, LogEntry) -> Html msg
 viewLogEntry config (time, entry) =
     tr [ class "entry" ]
-        [ td [ class "time" ] [ clockTime config time ]
+        [ td [ class "time" ] [ text (clockTime config time) ]
         , td [ class "event" ]
              ( case entry of
                    Began -> [ text "began" ]
@@ -439,7 +455,7 @@ viewLogEntry config (time, entry) =
                    CryingSquashed -> [ s [] [ text "crying stopped" ] ]
                    Waved timeDue ->
                        [ text "completed wave due at "
-                       , clockTime config timeDue
+                       , text (clockTime config timeDue)
                        ]
                    Debug s -> [ text s ]
              )
@@ -496,22 +512,29 @@ onEnter msg =
   in
       on "keypress" (Json.map (\key -> msg) decodeEnter)
         
-clockTime : Config -> Time.Posix -> Html msg
+clockTime : Config -> Time.Posix -> String
 clockTime config time = 
   let baseHour  = Time.toHour config.zone time
-      hour      = String.fromInt (if config.twelveHour
-                                  then modBy 12 baseHour
-                                  else baseHour)
+      hour      = formatHour config baseHour
       minute    = twoDigitInt    (Time.toMinute config.zone time)
       second    = twoDigitInt    (Time.toSecond config.zone time)
       ampm      = if config.twelveHour
-                  then if baseHour > 12
+                  then if baseHour >= 12
                        then "pm"
                        else "am"
                   else ""
   in
-  text (hour ++ ":" ++ minute ++ ":" ++ second ++ ampm)
-                        
+  hour ++ ":" ++ minute ++ ":" ++ second ++ ampm
+
+formatHour : Config -> Int -> String
+formatHour config baseHour =
+    let hourNum = if config.twelveHour
+                  then modBy 12 baseHour
+                  else baseHour
+        hour12  = if hourNum == 0 then 12 else hourNum
+    in
+        String.fromInt hour12
+      
 millisToLongTime : Int -> String
 millisToLongTime millis =
     let (hours, minutes, seconds) = millisToHMS millis in
@@ -611,3 +634,23 @@ relaxedInt =
                         Nothing -> 0
                         Just n -> n)
         <| Parser.getChompedString <| Parser.chompWhile Char.isDigit
+
+-- log CSV renderer
+logToCSV : Config -> Log -> String
+logToCSV config log =
+    String.join "\n" (List.filterMap (logRowToCSV config) log) ++ "\n"
+
+logRowToCSV : Config -> (Time.Posix, LogEntry) -> Maybe String
+logRowToCSV config (time, entry) =
+    logEntryToString config entry
+        |> Maybe.andThen (\e -> Just (clockTime config time ++ "," ++ e))
+
+logEntryToString : Config -> LogEntry -> Maybe String
+logEntryToString config entry =
+    case entry of
+        Began -> Just "began"
+        CryingStarted -> Just "crying started"
+        CryingStopped -> Just "crying stopped"
+        CryingSquashed -> Nothing
+        Waved timeDue -> Just ("completed wave due at " ++ clockTime config timeDue)
+        Debug s -> Nothing
