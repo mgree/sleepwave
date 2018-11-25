@@ -1,8 +1,5 @@
 {- TODO
 
-   some notion of "end"?
-     but what about false starts?
-
    store settings in localStorage (needs a port)
 -}
 
@@ -53,6 +50,7 @@ type State = Loading
            | GracePeriod Time.Posix -- timeEntered to restore
 
 type LogEntry = Began
+              | Ended
               | CryingStarted
               | CryingStopped
               | CryingSquashed
@@ -63,6 +61,15 @@ type RemainingMode = ClockAndTimeLeft
                    | ClockOnly
                    | TimeLeftOnly
 
+type alias TimeLeft =
+    { remaining : Int
+    , targetTime : Time.Posix
+    }
+
+waveDue : Model -> TimeLeft -> Bool
+waveDue model { targetTime } =
+    Time.posixToMillis model.time >= Time.posixToMillis targetTime
+    
 nextRemainingMode : RemainingMode -> RemainingMode
 nextRemainingMode mode =
     case mode of
@@ -111,7 +118,7 @@ trySetWaveTime config =
         Nothing -> config
         Just new -> { config |
                           waveTime = new,
-                          enteredWaveTime = millisToShortTime new }
+                          enteredWaveTime = millisToHMSShort new }
 
 trySetGraceTime : Config -> Config
 trySetGraceTime config =
@@ -119,7 +126,7 @@ trySetGraceTime config =
         Nothing -> config
         Just new -> { config |
                           graceTime = new,
-                          enteredGraceTime = millisToShortTime new }
+                          enteredGraceTime = millisToHMSShort new }
 
 cycleRemainingMode : Config -> Config
 cycleRemainingMode config =
@@ -129,6 +136,7 @@ type alias Model =
   { state : State
   , time : Time.Posix
   , timeBegun : Time.Posix
+  , priorMillis : Int
   , timeEntered : Time.Posix
   , log : Log
   , config : Config
@@ -154,8 +162,8 @@ initConfig =
     , graceTime = defaultGraceTime
     , twelveHour = True
     , remainingMode = ClockAndTimeLeft
-    , enteredWaveTime = millisToShortTime defaultWaveTime
-    , enteredGraceTime = millisToShortTime defaultGraceTime
+    , enteredWaveTime = millisToHMSShort defaultWaveTime
+    , enteredGraceTime = millisToHMSShort defaultGraceTime
     }
                  
 init : () -> (Model, Cmd Msg)
@@ -163,6 +171,7 @@ init _ =
   ( { state = Loading
     , time = Time.millisToPosix 0
     , timeBegun = Time.millisToPosix 0
+    , priorMillis = 0
     , timeEntered = Time.millisToPosix 0
     , log = []
     , config = initConfig
@@ -178,6 +187,7 @@ type Msg
   = Tick Time.Posix
   | InitializeTime Time.Zone Time.Posix
   | Begin
+  | End
   | StartWave
   | EndWave
   | ResumeWave Time.Posix
@@ -232,6 +242,15 @@ update msg model =
                       timeBegun = model.time }
       , Cmd.none)
 
+    End ->
+      ( logEntry Ended
+            { model | state = Loading,
+                      timeEntered = model.time,
+                      timeBegun = Time.millisToPosix 0,
+                      priorMillis = model.priorMillis +
+                                    timeDifference model.time model.timeBegun }
+      , Cmd.none)
+        
     StartWave ->
       ( logEntry CryingStarted
             { model | state = BetweenWaves,
@@ -315,22 +334,29 @@ viewClock model =
             
 viewRemaining : Model -> Html Msg
 viewRemaining model =
-    let computed = computeTimeLeft model model.timeEntered model.config.waveTime in
     div [ class "ten columns offset-by-one" ]
         (case model.state of
              Loading -> []
              Quiescent -> []
              BetweenWaves ->
+                 let computed =
+                         computeTimeLeft model model.timeEntered
+                             model.config.waveTime
+                 in
                  [ div [ class "next-wave" ]
-                       [ remainingTime model.config computed ]
+                       [ remainingTime model computed ]
                  ]
              Waving ->
                  [ h1 [ class "wave" ]
                       [ text "time for a visit" ]
                  ]
              GracePeriod originalTimeEntered ->
+                 let computed =
+                         computeTimeLeft model originalTimeEntered
+                             model.config.waveTime
+                 in
                [ div [ class "resume" ]
-                     [ remainingTime model.config computed
+                     [ remainingTime model computed
                      ]
                , div [ class "grace" ]
                      [ timeLeft (computeTimeLeft model
@@ -340,37 +366,44 @@ viewRemaining model =
                ]
       )
 
-remainingTime : Config -> (Int, Time.Posix) -> Html Msg
-remainingTime config computed =
-    let clock = targetTimeClock config computed
+remainingTime : Model -> TimeLeft -> Html Msg
+remainingTime model computed =
+    let clock = targetTimeClock model.config computed
         lbl   = span [] [ text "next wave" ]
         left  = timeLeft computed ""
     in
         div [ class "remaining"
             , onClick ConfigCycleRemaining
             ]
-            (case config.remainingMode of
-                 ClockAndTimeLeft -> [ lbl, clock, left ]
-                 ClockOnly        -> [ lbl, clock ]
-                 TimeLeftOnly     -> [ lbl,        left ])
+            (if waveDue model computed
+             then [ h1 [ class "wave" ]
+                        [ text "be ready for a visit" ]
+                  ]
+             else case model.config.remainingMode of
+                      ClockAndTimeLeft -> [ lbl, clock, left ]
+                      ClockOnly        -> [ lbl, clock ]
+                      TimeLeftOnly     -> [ lbl,        left ]
+            )
 
-timeLeft : (Int, Time.Posix) -> String -> Html msg
-timeLeft (remaining, targetTime) msg =
+timeLeft : TimeLeft -> String -> Html msg
+timeLeft { remaining, targetTime } msg =
     h4 [class "timeleft"]
-        [ text ("" ++ millisToLongTime remaining ++ " " ++ msg)
+        [ text ("" ++ millisToHMSShort remaining ++ " " ++ msg)
         ]
         
-targetTimeClock : Config -> (Int, Time.Posix) -> Html msg
-targetTimeClock config (remaining, targetTime) =
+targetTimeClock : Config -> TimeLeft -> Html msg
+targetTimeClock config { remaining, targetTime } =
     h1 [class "target"] [ text (clockTime config targetTime) ]
         
-computeTimeLeft : Model -> Time.Posix -> Int -> (Int, Time.Posix)
+computeTimeLeft : Model -> Time.Posix -> Int -> TimeLeft
 computeTimeLeft model timeStarted duration =
     let elapsed    = timeDifference model.time timeStarted
         remaining  = duration - elapsed
         targetTime = Time.posixToMillis model.time + remaining |> Time.millisToPosix
     in
-        (remaining, targetTime)
+        { remaining = remaining
+        , targetTime = targetTime
+        }
         
 viewActions : Model -> Html Msg
 viewActions model =
@@ -380,7 +413,10 @@ viewActions model =
             button (actionClass (onClick Begin)) [ text "begin" ]
              
         Quiescent ->
-            button (actionClass (onClick StartWave)) [ text "crying started" ]
+            div []
+                [ button (actionClass (onClick StartWave)) [ text "crying started" ]
+                , button (actionClass (onClick End)) [ text "end" ]
+                ]
         
         BetweenWaves ->
             button (actionClass (onClick EndWave)) [ text "crying stopped" ]
@@ -398,10 +434,10 @@ viewInfo model =
         (if hasBegun model
          then [ rowLabel "Information"
               , div [ class "duration two columns offset-by-two" ]
-                    [ text "You've been doing the sleep wave for "
-                    , text (millisToLongTime
-                                (timeDifference model.time model.timeBegun))
-                    , text "."
+                    [ text "Total time: "
+                    , text (millisToHMSLong
+                                (timeDifference model.time model.timeBegun +
+                                 model.priorMillis))
                     ]
               , Html.Lazy.lazy viewWaveCount (countWaves model)
               ]
@@ -448,6 +484,7 @@ viewLogEntry config (time, entry) =
         , td [ class "event" ]
              ( case entry of
                    Began -> [ text "began" ]
+                   Ended -> [ text "ended" ]
                    CryingStarted -> [ text "crying started" ]
                    CryingStopped -> [ text "crying stopped" ]
                    CryingSquashed -> [ s [] [ text "crying stopped" ] ]
@@ -499,7 +536,7 @@ viewConfig config =
 
 timeInput : Config -> (Config -> String) -> (Config -> Int) -> String -> String -> (String -> Msg) -> Msg -> List (Html Msg)
 timeInput config entered actual inputId labelText updateMsg setMsg =
-    let inSync = (entered config) == millisToShortTime (actual config) in
+    let inSync = (entered config) == millisToHMSShort (actual config) in
     let valid = isValidHMS (entered config) in
     [ label [ for inputId ] [ text (labelText ++ " ") ]
     , input [ type_ "text"
@@ -557,8 +594,8 @@ millisToLongTime millis =
     in
     List.filter (not << String.isEmpty) strs |> String.join " "
         
-millisToShortTime : Int -> String
-millisToShortTime millis =
+millisToHMSShort : Int -> String
+millisToHMSShort millis =
     let (hours, minutes, seconds) = millisToHMS millis in
     let strs = [ if hours > 0 then String.fromInt hours ++ ":" else ""
                , if hours > 0
@@ -573,7 +610,13 @@ millisToShortTime millis =
     in
     List.filter (not << String.isEmpty) strs |> String.join ":"
 
-
+millisToHMSLong : Int -> String
+millisToHMSLong millis =
+    let (hours, minutes, seconds) = millisToHMS millis in
+    (if hours > 0 then String.fromInt hours ++ ":" else "") ++
+    twoDigitInt minutes ++ ":" ++
+    twoDigitInt seconds
+        
 millisToHMS : Int -> (Int, Int, Int)
 millisToHMS millis =              
     let totalSeconds = millis // 1000 in
@@ -661,6 +704,7 @@ logEntryToString : Config -> LogEntry -> Maybe String
 logEntryToString config entry =
     case entry of
         Began -> Just "began"
+        Ended -> Just "ended"
         CryingStarted -> Just "crying started"
         CryingStopped -> Just "crying stopped"
         CryingSquashed -> Nothing
