@@ -11,7 +11,14 @@
   <body>
     <div id="elm"></div>
     <script>
-      var app = Elm.Main.init({ node: document.getElementById('elm') });
+      let app = Elm.Main.init({
+          node: document.getElementById('elm'),
+          flags: JSON.parse(localStorage.getItem('settings'))
+      });
+
+      app.ports.saveSettings.subscribe(function (settings) {
+          localStorage.setItem('settings', JSON.stringify(settings));
+      });
     </script>
   </body>
 </html>
