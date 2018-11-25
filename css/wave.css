@@ -33,8 +33,12 @@ div#config-twelve-hour label {
     border-radius: 3rem;
 }
 
-.clock {
+h1.clock {
     text-align: center;
+}
+
+h1.wave {
+    color: #ccf;
 }
 
 .target {
@@ -77,6 +81,7 @@ div.row.actions button {
     font-size: 3.6rem; line-height: 1.25; letter-spacing: -.1rem;
     height: 100%;
     padding: 0px;
+    margin-bottom: 2rem;
 }
 
 table.log thead {
