@@ -77,14 +77,14 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
   return fun.a === 9 ? fun.f(a, b, c, d, e, f, g, h, i) : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
 }
 
-console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.0/optimize for better performance and smaller assets.');
 
 
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
 
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+var _List_Nil = { $: 0 };
+var _List_Nil_UNUSED = { $: '[]' };
+
+function _List_Cons(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons_UNUSED(hd, tl) { return { $: '::', a: hd, b: tl }; }
 
 
 var _List_cons = F2(_List_Cons);
@@ -194,7 +194,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return false;
 	}
 
-	/**/
+	/**_UNUSED/
 	if (x.$ === 'Set_elm_builtin')
 	{
 		x = elm$core$Set$toList(x);
@@ -207,7 +207,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 	}
 	//*/
 
-	/**_UNUSED/
+	/**/
 	if (x.$ < 0)
 	{
 		x = elm$core$Dict$toList(x);
@@ -242,7 +242,7 @@ function _Utils_cmp(x, y, ord)
 		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
 	}
 
-	/**/
+	/**_UNUSED/
 	if (x instanceof String)
 	{
 		var a = x.valueOf();
@@ -251,10 +251,10 @@ function _Utils_cmp(x, y, ord)
 	}
 	//*/
 
-	/**_UNUSED/
+	/**/
 	if (typeof x.$ === 'undefined')
 	//*/
-	/**/
+	/**_UNUSED/
 	if (x.$[0] === '#')
 	//*/
 	{
@@ -284,17 +284,17 @@ var _Utils_compare = F2(function(x, y)
 
 // COMMON VALUES
 
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
+var _Utils_Tuple0 = 0;
+var _Utils_Tuple0_UNUSED = { $: '#0' };
 
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2_UNUSED(a, b) { return { $: '#2', a: a, b: b }; }
 
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3_UNUSED(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
 
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
+function _Utils_chr(c) { return c; }
+function _Utils_chr_UNUSED(c) { return new String(c); }
 
 
 // RECORDS
@@ -499,12 +499,12 @@ var _JsArray_appendN = F3(function(n, dest, source)
 
 // LOG
 
-var _Debug_log_UNUSED = F2(function(tag, value)
+var _Debug_log = F2(function(tag, value)
 {
 	return value;
 });
 
-var _Debug_log = F2(function(tag, value)
+var _Debug_log_UNUSED = F2(function(tag, value)
 {
 	console.log(tag + ': ' + _Debug_toString(value));
 	return value;
@@ -530,12 +530,12 @@ function _Debug_todoCase(moduleName, region, value)
 
 // TO STRING
 
-function _Debug_toString_UNUSED(value)
+function _Debug_toString(value)
 {
 	return '<internals>';
 }
 
-function _Debug_toString(value)
+function _Debug_toString_UNUSED(value)
 {
 	return _Debug_toAnsiString(false, value);
 }
@@ -720,13 +720,13 @@ function _Debug_toHexDigit(n)
 // CRASH
 
 
-function _Debug_crash_UNUSED(identifier)
+function _Debug_crash(identifier)
 {
 	throw new Error('https://github.com/elm/core/blob/1.0.0/hints/' + identifier + '.md');
 }
 
 
-function _Debug_crash(identifier, fact1, fact2, fact3, fact4)
+function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 {
 	switch(identifier)
 	{
@@ -784,11 +784,11 @@ function _Debug_crash(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.start.line === region.end.line)
+	if (region.ac.P === region.aj.P)
 	{
-		return 'on line ' + region.start.line;
+		return 'on line ' + region.ac.P;
 	}
-	return 'on lines ' + region.start.line + ' through ' + region.end.line;
+	return 'on lines ' + region.ac.P + ' through ' + region.aj.P;
 }
 
 
@@ -1249,7 +1249,7 @@ function _Char_toLocaleLower(char)
 
 
 
-/**/
+/**_UNUSED/
 function _Json_errorToString(error)
 {
 	return elm$json$Json$Decode$errorToString(error);
@@ -1653,11 +1653,11 @@ var _Json_encode = F2(function(indentLevel, value)
 	return JSON.stringify(_Json_unwrap(value), null, indentLevel) + '';
 });
 
-function _Json_wrap(value) { return { $: 0, a: value }; }
-function _Json_unwrap(value) { return value.a; }
+function _Json_wrap_UNUSED(value) { return { $: 0, a: value }; }
+function _Json_unwrap_UNUSED(value) { return value.a; }
 
-function _Json_wrap_UNUSED(value) { return value; }
-function _Json_unwrap_UNUSED(value) { return value; }
+function _Json_wrap(value) { return value; }
+function _Json_unwrap(value) { return value; }
 
 function _Json_emptyArray() { return []; }
 function _Json_emptyObject() { return {}; }
@@ -1894,9 +1894,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.init,
-		impl.update,
-		impl.subscriptions,
+		impl.aZ,
+		impl.a6,
+		impl.a4,
 		function() { return function() {} }
 	);
 });
@@ -1909,7 +1909,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 function _Platform_initialize(flagDecoder, args, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(_Json_run, flagDecoder, _Json_wrap(args ? args['flags'] : undefined));
-	elm$core$Result$isOk(result) || _Debug_crash(2 /**/, _Json_errorToString(result.a) /**/);
+	elm$core$Result$isOk(result) || _Debug_crash(2 /**_UNUSED/, _Json_errorToString(result.a) /**/);
 	var managers = {};
 	result = init(result.a);
 	var model = result.a;
@@ -2308,7 +2308,7 @@ function _Platform_setupIncomingPort(name, sendToApp)
 //
 
 
-function _Platform_export_UNUSED(exports)
+function _Platform_export(exports)
 {
 	scope['Elm']
 		? _Platform_mergeExportsProd(scope['Elm'], exports)
@@ -2329,7 +2329,7 @@ function _Platform_mergeExportsProd(obj, exports)
 }
 
 
-function _Platform_export(exports)
+function _Platform_export_UNUSED(exports)
 {
 	scope['Elm']
 		? _Platform_mergeExportsDebug('Elm', scope['Elm'], exports)
@@ -2690,10 +2690,10 @@ var _VirtualDom_init = F4(function(virtualNode, flagDecoder, debugMetadata, args
 {
 	// NOTE: this function needs _Platform_export available to work
 
-	/**_UNUSED/
+	/**/
 	var node = args['node'];
 	//*/
-	/**/
+	/**_UNUSED/
 	var node = args && args['node'] ? args['node'] : _Debug_crash(0);
 	//*/
 
@@ -2948,24 +2948,24 @@ function _VirtualDom_noInnerHtmlOrFormAction(key)
 	return key == 'innerHTML' || key == 'formAction' ? 'data-' + key : key;
 }
 
-function _VirtualDom_noJavaScriptUri_UNUSED(value)
+function _VirtualDom_noJavaScriptUri(value)
 {
 	return /^javascript:/i.test(value.replace(/\s/g,'')) ? '' : value;
 }
 
-function _VirtualDom_noJavaScriptUri(value)
+function _VirtualDom_noJavaScriptUri_UNUSED(value)
 {
 	return /^javascript:/i.test(value.replace(/\s/g,''))
 		? 'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'
 		: value;
 }
 
-function _VirtualDom_noJavaScriptOrHtmlUri_UNUSED(value)
+function _VirtualDom_noJavaScriptOrHtmlUri(value)
 {
 	return /^\s*(javascript:|data:text\/html)/i.test(value) ? '' : value;
 }
 
-function _VirtualDom_noJavaScriptOrHtmlUri(value)
+function _VirtualDom_noJavaScriptOrHtmlUri_UNUSED(value)
 {
 	return /^\s*(javascript:|data:text\/html)/i.test(value)
 		? 'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'
@@ -3017,9 +3017,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		message: func(record.message),
-		stopPropagation: record.stopPropagation,
-		preventDefault: record.preventDefault
+		w: func(record.w),
+		ad: record.ad,
+		ab: record.ab
 	}
 });
 
@@ -3287,11 +3287,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.message;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.stopPropagation;
+		var message = !tag ? value : tag < 3 ? value.a : value.w;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ad;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.preventDefault) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ab) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -4241,15 +4241,15 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.init,
-		impl.update,
-		impl.subscriptions,
+		impl.aZ,
+		impl.a6,
+		impl.a4,
 		function(sendToApp, initialModel) {
-			var view = impl.view;
-			/**_UNUSED/
+			var view = impl.a8;
+			/**/
 			var domNode = args['node'];
 			//*/
-			/**/
+			/**_UNUSED/
 			var domNode = args && args['node'] ? args['node'] : _Debug_crash(0);
 			//*/
 			var currNode = _VirtualDom_virtualize(domNode);
@@ -4277,12 +4277,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.init,
-		impl.update,
-		impl.subscriptions,
+		impl.aZ,
+		impl.a6,
+		impl.a4,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.setup && impl.setup(sendToApp)
-			var view = impl.view;
+			var divertHrefToApp = impl.R && impl.R(sendToApp)
+			var view = impl.a8;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4290,12 +4290,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.body);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aR);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.title) && (_VirtualDom_doc.title = title = doc.title);
+				(title !== doc.a5) && (_VirtualDom_doc.title = title = doc.a5);
 			});
 		}
 	);
@@ -4351,12 +4351,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.onUrlChange;
-	var onUrlRequest = impl.onUrlRequest;
+	var onUrlChange = impl.a0;
+	var onUrlRequest = impl.a1;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		setup: function(sendToApp)
+		R: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4372,9 +4372,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.protocol === next.protocol
-							&& curr.host === next.host
-							&& curr.port_.a === next.port_.a
+							&& curr.aC === next.aC
+							&& curr.ap === next.ap
+							&& curr.ay.a === next.ay.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4382,13 +4382,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		init: function(flags)
+		aZ: function(flags)
 		{
-			return A3(impl.init, flags, _Browser_getUrl(), key);
+			return A3(impl.aZ, flags, _Browser_getUrl(), key);
 		},
-		view: impl.view,
-		update: impl.update,
-		subscriptions: impl.subscriptions
+		a8: impl.a8,
+		a6: impl.a6,
+		a4: impl.a4
 	});
 }
 
@@ -4454,17 +4454,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { hidden: 'hidden', change: 'visibilitychange' }
+		? { aX: 'hidden', aS: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { hidden: 'mozHidden', change: 'mozvisibilitychange' }
+		? { aX: 'mozHidden', aS: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { hidden: 'msHidden', change: 'msvisibilitychange' }
+		? { aX: 'msHidden', aS: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { hidden: 'webkitHidden', change: 'webkitvisibilitychange' }
-		: { hidden: 'hidden', change: 'visibilitychange' };
+		? { aX: 'webkitHidden', aS: 'webkitvisibilitychange' }
+		: { aX: 'hidden', aS: 'visibilitychange' };
 }
 
 
@@ -4545,12 +4545,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		scene: _Browser_getScene(),
-		viewport: {
-			x: _Browser_window.pageXOffset,
-			y: _Browser_window.pageYOffset,
-			width: _Browser_doc.documentElement.clientWidth,
-			height: _Browser_doc.documentElement.clientHeight
+		aI: _Browser_getScene(),
+		aO: {
+			Y: _Browser_window.pageXOffset,
+			Z: _Browser_window.pageYOffset,
+			M: _Browser_doc.documentElement.clientWidth,
+			H: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4560,8 +4560,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		width: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		height: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		M: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		H: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4584,15 +4584,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			scene: {
-				width: node.scrollWidth,
-				height: node.scrollHeight
+			aI: {
+				M: node.scrollWidth,
+				H: node.scrollHeight
 			},
-			viewport: {
-				x: node.scrollLeft,
-				y: node.scrollTop,
-				width: node.clientWidth,
-				height: node.clientHeight
+			aO: {
+				Y: node.scrollLeft,
+				Z: node.scrollTop,
+				M: node.clientWidth,
+				H: node.clientHeight
 			}
 		};
 	});
@@ -4622,18 +4622,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			scene: _Browser_getScene(),
-			viewport: {
-				x: x,
-				y: y,
-				width: _Browser_doc.documentElement.clientWidth,
-				height: _Browser_doc.documentElement.clientHeight
+			aI: _Browser_getScene(),
+			aO: {
+				Y: x,
+				Z: y,
+				M: _Browser_doc.documentElement.clientWidth,
+				H: _Browser_doc.documentElement.clientHeight
 			},
-			element: {
-				x: x + rect.left,
-				y: y + rect.top,
-				width: rect.width,
-				height: rect.height
+			aU: {
+				Y: x + rect.left,
+				Z: y + rect.top,
+				M: rect.width,
+				H: rect.height
 			}
 		};
 	});
@@ -4670,19 +4670,19 @@ function _Browser_load(url)
 }
 var author$project$Main$InitializeTime = F2(
 	function (a, b) {
-		return {$: 'InitializeTime', a: a, b: b};
+		return {$: 1, a: a, b: b};
 	});
-var author$project$Main$Loading = {$: 'Loading'};
-var author$project$Main$ClockAndTimeLeft = {$: 'ClockAndTimeLeft'};
-var elm$core$Basics$True = {$: 'True'};
-var elm$core$Basics$EQ = {$: 'EQ'};
-var elm$core$Basics$GT = {$: 'GT'};
-var elm$core$Basics$LT = {$: 'LT'};
+var author$project$Main$Loading = {$: 0};
+var author$project$Main$ClockAndTimeLeft = 0;
+var elm$core$Basics$True = 0;
+var elm$core$Basics$EQ = 1;
+var elm$core$Basics$GT = 2;
+var elm$core$Basics$LT = 0;
 var elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
 		while (true) {
-			if (t.$ === 'RBEmpty_elm_builtin') {
+			if (t.$ === -2) {
 				return acc;
 			} else {
 				var key = t.b;
@@ -4728,7 +4728,7 @@ var elm$core$Dict$keys = function (dict) {
 		dict);
 };
 var elm$core$Set$toList = function (_n0) {
-	var dict = _n0.a;
+	var dict = _n0;
 	return elm$core$Dict$keys(dict);
 };
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
@@ -4738,7 +4738,7 @@ var elm$core$Array$foldr = F3(
 		var tail = _n0.d;
 		var helper = F2(
 			function (node, acc) {
-				if (node.$ === 'SubTree') {
+				if (!node.$) {
 					var subTree = node.a;
 					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
 				} else {
@@ -4756,7 +4756,7 @@ var elm$core$Array$toList = function (array) {
 	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
 var elm$core$Basics$mul = _Basics_mul;
-var author$project$Main$defaultSettings = {graceTime: 1000 * 30, remainingMode: author$project$Main$ClockAndTimeLeft, twelveHour: true, waveTime: (1000 * 60) * 5};
+var author$project$Main$defaultSettings = {l: 1000 * 30, q: 0, m: true, k: (1000 * 60) * 5};
 var elm$core$Basics$idiv = _Basics_idiv;
 var elm$core$Basics$modBy = _Basics_modBy;
 var author$project$Main$millisToHMS = function (millis) {
@@ -4768,9 +4768,9 @@ var author$project$Main$millisToHMS = function (millis) {
 	return _Utils_Tuple3(hours, minutes, seconds);
 };
 var elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
+	return {$: 0, a: a};
 };
-var elm$core$Maybe$Nothing = {$: 'Nothing'};
+var elm$core$Maybe$Nothing = {$: 1};
 var elm$core$String$fromInt = _String_fromNumber;
 var elm$core$Basics$append = _Utils_append;
 var elm$core$Basics$sub = _Basics_sub;
@@ -4812,7 +4812,7 @@ var author$project$Main$twoDigitInt = function (n) {
 	return A3(
 		elm$core$String$padLeft,
 		2,
-		_Utils_chr('0'),
+		'0',
 		elm$core$String$fromInt(n));
 };
 var elm$core$Basics$apR = F2(
@@ -4947,26 +4947,26 @@ var author$project$Main$millisToHMSShort = function (millis) {
 };
 var elm$time$Time$Zone = F2(
 	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var elm$time$Time$utc = A2(elm$time$Time$Zone, 0, _List_Nil);
 var author$project$Main$initConfig = function (settings) {
 	return {
-		enteredGraceTime: author$project$Main$millisToHMSShort(settings.graceTime),
-		enteredWaveTime: author$project$Main$millisToHMSShort(settings.waveTime),
-		graceTime: settings.graceTime,
-		remainingMode: settings.remainingMode,
-		twelveHour: settings.twelveHour,
-		waveTime: settings.waveTime,
-		zone: elm$time$Time$utc
+		F: author$project$Main$millisToHMSShort(settings.l),
+		G: author$project$Main$millisToHMSShort(settings.k),
+		l: settings.l,
+		q: settings.q,
+		m: settings.m,
+		k: settings.k,
+		N: elm$time$Time$utc
 	};
 };
-var author$project$Main$ClockOnly = {$: 'ClockOnly'};
-var author$project$Main$TimeLeftOnly = {$: 'TimeLeftOnly'};
+var author$project$Main$ClockOnly = 1;
+var author$project$Main$TimeLeftOnly = 2;
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
 	function (a, b, c, d) {
-		return {$: 'Array_elm_builtin', a: a, b: b, c: c, d: d};
+		return {$: 0, a: a, b: b, c: c, d: d};
 	});
 var elm$core$Basics$ceiling = _Basics_ceiling;
 var elm$core$Basics$fdiv = _Basics_fdiv;
@@ -4980,10 +4980,10 @@ var elm$core$Array$shiftStep = elm$core$Basics$ceiling(
 var elm$core$Elm$JsArray$empty = _JsArray_empty;
 var elm$core$Array$empty = A4(elm$core$Array$Array_elm_builtin, 0, elm$core$Array$shiftStep, elm$core$Elm$JsArray$empty, elm$core$Elm$JsArray$empty);
 var elm$core$Array$Leaf = function (a) {
-	return {$: 'Leaf', a: a};
+	return {$: 1, a: a};
 };
 var elm$core$Array$SubTree = function (a) {
-	return {$: 'SubTree', a: a};
+	return {$: 0, a: a};
 };
 var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
 var elm$core$Array$compressNodes = F2(
@@ -5036,28 +5036,28 @@ var elm$core$Basics$max = F2(
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.nodeListSize) {
+		if (!builder.g) {
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.tail),
+				elm$core$Elm$JsArray$length(builder.h),
 				elm$core$Array$shiftStep,
 				elm$core$Elm$JsArray$empty,
-				builder.tail);
+				builder.h);
 		} else {
-			var treeLen = builder.nodeListSize * elm$core$Array$branchFactor;
+			var treeLen = builder.g * elm$core$Array$branchFactor;
 			var depth = elm$core$Basics$floor(
 				A2(elm$core$Basics$logBase, elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.nodeList) : builder.nodeList;
-			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.nodeListSize);
+			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.i) : builder.i;
+			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.g);
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.tail) + treeLen,
+				elm$core$Elm$JsArray$length(builder.h) + treeLen,
 				A2(elm$core$Basics$max, 5, depth * elm$core$Array$shiftStep),
 				tree,
-				builder.tail);
+				builder.h);
 		}
 	});
-var elm$core$Basics$False = {$: 'False'};
+var elm$core$Basics$False = 1;
 var elm$core$Basics$lt = _Utils_lt;
 var elm$core$Elm$JsArray$initialize = _JsArray_initialize;
 var elm$core$Array$initializeHelp = F5(
@@ -5068,7 +5068,7 @@ var elm$core$Array$initializeHelp = F5(
 				return A2(
 					elm$core$Array$builderToArray,
 					false,
-					{nodeList: nodeList, nodeListSize: (len / elm$core$Array$branchFactor) | 0, tail: tail});
+					{i: nodeList, g: (len / elm$core$Array$branchFactor) | 0, h: tail});
 			} else {
 				var leaf = elm$core$Array$Leaf(
 					A3(elm$core$Elm$JsArray$initialize, elm$core$Array$branchFactor, fromIndex, fn));
@@ -5099,13 +5099,13 @@ var elm$core$Array$initialize = F2(
 		}
 	});
 var elm$core$Result$Err = function (a) {
-	return {$: 'Err', a: a};
+	return {$: 1, a: a};
 };
 var elm$core$Result$Ok = function (a) {
-	return {$: 'Ok', a: a};
+	return {$: 0, a: a};
 };
 var elm$core$Result$isOk = function (result) {
-	if (result.$ === 'Ok') {
+	if (!result.$) {
 		return true;
 	} else {
 		return false;
@@ -5113,18 +5113,18 @@ var elm$core$Result$isOk = function (result) {
 };
 var elm$json$Json$Decode$Failure = F2(
 	function (a, b) {
-		return {$: 'Failure', a: a, b: b};
+		return {$: 3, a: a, b: b};
 	});
 var elm$json$Json$Decode$Field = F2(
 	function (a, b) {
-		return {$: 'Field', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var elm$json$Json$Decode$Index = F2(
 	function (a, b) {
-		return {$: 'Index', a: a, b: b};
+		return {$: 1, a: a, b: b};
 	});
 var elm$json$Json$Decode$OneOf = function (a) {
-	return {$: 'OneOf', a: a};
+	return {$: 2, a: a};
 };
 var elm$core$Basics$and = _Basics_and;
 var elm$core$Char$toCode = _Char_toCode;
@@ -5216,12 +5216,12 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 		errorToStringHelp:
 		while (true) {
 			switch (error.$) {
-				case 'Field':
+				case 0:
 					var f = error.a;
 					var err = error.b;
 					var isSimple = function () {
 						var _n1 = elm$core$String$uncons(f);
-						if (_n1.$ === 'Nothing') {
+						if (_n1.$ === 1) {
 							return false;
 						} else {
 							var _n2 = _n1.a;
@@ -5236,7 +5236,7 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 					error = $temp$error;
 					context = $temp$context;
 					continue errorToStringHelp;
-				case 'Index':
+				case 1:
 					var i = error.a;
 					var err = error.b;
 					var indexName = '[' + (elm$core$String$fromInt(i) + ']');
@@ -5245,7 +5245,7 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 					error = $temp$error;
 					context = $temp$context;
 					continue errorToStringHelp;
-				case 'OneOf':
+				case 2:
 					var errors = error.a;
 					if (!errors.b) {
 						return 'Ran into a Json.Decode.oneOf with no possibilities' + function () {
@@ -5315,11 +5315,11 @@ var author$project$Main$remainingModeDecoder = A2(
 	function (s) {
 		switch (s) {
 			case 'ClockAndTimeLeft':
-				return elm$json$Json$Decode$succeed(author$project$Main$ClockAndTimeLeft);
+				return elm$json$Json$Decode$succeed(0);
 			case 'ClockOnly':
-				return elm$json$Json$Decode$succeed(author$project$Main$ClockOnly);
+				return elm$json$Json$Decode$succeed(1);
 			case 'TimeLeftOnly':
-				return elm$json$Json$Decode$succeed(author$project$Main$TimeLeftOnly);
+				return elm$json$Json$Decode$succeed(2);
 			default:
 				return elm$json$Json$Decode$fail('bad remaining mode');
 		}
@@ -5333,7 +5333,7 @@ var author$project$Main$settingsDecoder = A5(
 	elm$json$Json$Decode$map4,
 	F4(
 		function (waveTime, graceTime, twelveHour, remainingMode) {
-			return {graceTime: graceTime, remainingMode: remainingMode, twelveHour: twelveHour, waveTime: waveTime};
+			return {l: graceTime, q: remainingMode, m: twelveHour, k: waveTime};
 		}),
 	A2(elm$json$Json$Decode$field, 'waveTime', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'graceTime', elm$json$Json$Decode$int),
@@ -5359,10 +5359,8 @@ var elm$core$Task$map2 = F3(
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
-var elm$core$Task$Perform = function (a) {
-	return {$: 'Perform', a: a};
-};
-var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
+var elm$core$Task$Perform = elm$core$Basics$identity;
+var elm$core$Task$init = elm$core$Task$succeed(0);
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -5397,7 +5395,7 @@ var elm$core$Task$sequence = function (tasks) {
 var elm$core$Platform$sendToApp = _Platform_sendToApp;
 var elm$core$Task$spawnCmd = F2(
 	function (router, _n0) {
-		var task = _n0.a;
+		var task = _n0;
 		return _Scheduler_spawn(
 			A2(
 				elm$core$Task$andThen,
@@ -5409,7 +5407,7 @@ var elm$core$Task$onEffects = F3(
 		return A2(
 			elm$core$Task$map,
 			function (_n0) {
-				return _Utils_Tuple0;
+				return 0;
 			},
 			elm$core$Task$sequence(
 				A2(
@@ -5419,55 +5417,51 @@ var elm$core$Task$onEffects = F3(
 	});
 var elm$core$Task$onSelfMsg = F3(
 	function (_n0, _n1, _n2) {
-		return elm$core$Task$succeed(_Utils_Tuple0);
+		return elm$core$Task$succeed(0);
 	});
 var elm$core$Task$cmdMap = F2(
 	function (tagger, _n0) {
-		var task = _n0.a;
-		return elm$core$Task$Perform(
-			A2(elm$core$Task$map, tagger, task));
+		var task = _n0;
+		return A2(elm$core$Task$map, tagger, task);
 	});
 _Platform_effectManagers['Task'] = _Platform_createManager(elm$core$Task$init, elm$core$Task$onEffects, elm$core$Task$onSelfMsg, elm$core$Task$cmdMap);
 var elm$core$Task$command = _Platform_leaf('Task');
 var elm$core$Task$perform = F2(
 	function (toMessage, task) {
 		return elm$core$Task$command(
-			elm$core$Task$Perform(
-				A2(elm$core$Task$map, toMessage, task)));
+			A2(elm$core$Task$map, toMessage, task));
 	});
 var elm$json$Json$Decode$decodeValue = _Json_run;
 var elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
+	return {$: 0, a: a};
 };
 var elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
+	return {$: 1, a: a};
 };
 var elm$time$Time$customZone = elm$time$Time$Zone;
-var elm$time$Time$here = _Time_here(_Utils_Tuple0);
-var elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var elm$time$Time$millisToPosix = elm$time$Time$Posix;
+var elm$time$Time$here = _Time_here(0);
+var elm$time$Time$Posix = elm$core$Basics$identity;
+var elm$time$Time$millisToPosix = elm$core$Basics$identity;
 var elm$time$Time$now = _Time_now(elm$time$Time$millisToPosix);
 var author$project$Main$init = function (localStorageSettings) {
 	return _Utils_Tuple2(
 		{
-			config: author$project$Main$initConfig(
+			e: author$project$Main$initConfig(
 				function () {
 					var _n0 = A2(elm$json$Json$Decode$decodeValue, author$project$Main$settingsDecoder, localStorageSettings);
-					if (_n0.$ === 'Err') {
+					if (_n0.$ === 1) {
 						return author$project$Main$defaultSettings;
 					} else {
 						var settings = _n0.a;
 						return settings;
 					}
 				}()),
-			log: _List_Nil,
-			priorMillis: 0,
-			state: author$project$Main$Loading,
-			time: elm$time$Time$millisToPosix(0),
-			timeBegun: elm$time$Time$millisToPosix(0),
-			timeEntered: elm$time$Time$millisToPosix(0)
+			s: _List_Nil,
+			Q: 0,
+			o: author$project$Main$Loading,
+			f: elm$time$Time$millisToPosix(0),
+			C: elm$time$Time$millisToPosix(0),
+			j: elm$time$Time$millisToPosix(0)
 		},
 		A2(
 			elm$core$Task$perform,
@@ -5477,36 +5471,36 @@ var author$project$Main$init = function (localStorageSettings) {
 			A3(elm$core$Task$map2, author$project$Main$InitializeTime, elm$time$Time$here, elm$time$Time$now)));
 };
 var author$project$Main$Tick = function (a) {
-	return {$: 'Tick', a: a};
+	return {$: 0, a: a};
 };
 var elm$time$Time$Every = F2(
 	function (a, b) {
-		return {$: 'Every', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
-var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {processes: processes, taggers: taggers};
+		return {aB: processes, aM: taggers};
 	});
 var elm$time$Time$init = elm$core$Task$succeed(
 	A2(elm$time$Time$State, elm$core$Dict$empty, elm$core$Dict$empty));
-var elm$core$Dict$Black = {$: 'Black'};
+var elm$core$Dict$Black = 1;
 var elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+		return {$: -1, a: a, b: b, c: c, d: d, e: e};
 	});
 var elm$core$Basics$compare = _Utils_compare;
-var elm$core$Dict$Red = {$: 'Red'};
+var elm$core$Dict$Red = 0;
 var elm$core$Dict$balance = F5(
 	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+		if ((right.$ === -1) && (!right.a)) {
 			var _n1 = right.a;
 			var rK = right.b;
 			var rV = right.c;
 			var rLeft = right.d;
 			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			if ((left.$ === -1) && (!left.a)) {
 				var _n3 = left.a;
 				var lK = left.b;
 				var lV = left.c;
@@ -5514,22 +5508,22 @@ var elm$core$Dict$balance = F5(
 				var lRight = left.e;
 				return A5(
 					elm$core$Dict$RBNode_elm_builtin,
-					elm$core$Dict$Red,
+					0,
 					key,
 					value,
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, rK, rV, rLeft, rRight));
+					A5(elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
+					A5(elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
 			} else {
 				return A5(
 					elm$core$Dict$RBNode_elm_builtin,
 					color,
 					rK,
 					rV,
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, left, rLeft),
+					A5(elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
 					rRight);
 			}
 		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
 				var _n5 = left.a;
 				var lK = left.b;
 				var lV = left.c;
@@ -5542,11 +5536,11 @@ var elm$core$Dict$balance = F5(
 				var lRight = left.e;
 				return A5(
 					elm$core$Dict$RBNode_elm_builtin,
-					elm$core$Dict$Red,
+					0,
 					lK,
 					lV,
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, key, value, lRight, right));
+					A5(elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
+					A5(elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
 			} else {
 				return A5(elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
 			}
@@ -5554,8 +5548,8 @@ var elm$core$Dict$balance = F5(
 	});
 var elm$core$Dict$insertHelp = F3(
 	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, elm$core$Dict$RBEmpty_elm_builtin, elm$core$Dict$RBEmpty_elm_builtin);
+		if (dict.$ === -2) {
+			return A5(elm$core$Dict$RBNode_elm_builtin, 0, key, value, elm$core$Dict$RBEmpty_elm_builtin, elm$core$Dict$RBEmpty_elm_builtin);
 		} else {
 			var nColor = dict.a;
 			var nKey = dict.b;
@@ -5563,8 +5557,8 @@ var elm$core$Dict$insertHelp = F3(
 			var nLeft = dict.d;
 			var nRight = dict.e;
 			var _n1 = A2(elm$core$Basics$compare, key, nKey);
-			switch (_n1.$) {
-				case 'LT':
+			switch (_n1) {
+				case 0:
 					return A5(
 						elm$core$Dict$balance,
 						nColor,
@@ -5572,7 +5566,7 @@ var elm$core$Dict$insertHelp = F3(
 						nValue,
 						A3(elm$core$Dict$insertHelp, key, value, nLeft),
 						nRight);
-				case 'EQ':
+				case 1:
 					return A5(elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
 				default:
 					return A5(
@@ -5588,13 +5582,13 @@ var elm$core$Dict$insertHelp = F3(
 var elm$core$Dict$insert = F3(
 	function (key, value, dict) {
 		var _n0 = A3(elm$core$Dict$insertHelp, key, value, dict);
-		if ((_n0.$ === 'RBNode_elm_builtin') && (_n0.a.$ === 'Red')) {
+		if ((_n0.$ === -1) && (!_n0.a)) {
 			var _n1 = _n0.a;
 			var k = _n0.b;
 			var v = _n0.c;
 			var l = _n0.d;
 			var r = _n0.e;
-			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, k, v, l, r);
+			return A5(elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
 		} else {
 			var x = _n0;
 			return x;
@@ -5604,7 +5598,7 @@ var elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
 		foldl:
 		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
+			if (dict.$ === -2) {
 				return acc;
 			} else {
 				var key = dict.b;
@@ -5691,7 +5685,7 @@ var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
 		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
+			if (dict.$ === -2) {
 				return elm$core$Maybe$Nothing;
 			} else {
 				var key = dict.b;
@@ -5699,14 +5693,14 @@ var elm$core$Dict$get = F2(
 				var left = dict.d;
 				var right = dict.e;
 				var _n1 = A2(elm$core$Basics$compare, targetKey, key);
-				switch (_n1.$) {
-					case 'LT':
+				switch (_n1) {
+					case 0:
 						var $temp$targetKey = targetKey,
 							$temp$dict = left;
 						targetKey = $temp$targetKey;
 						dict = $temp$dict;
 						continue get;
-					case 'EQ':
+					case 1:
 						return elm$core$Maybe$Just(value);
 					default:
 						var $temp$targetKey = targetKey,
@@ -5723,7 +5717,7 @@ var elm$time$Time$addMySub = F2(
 		var interval = _n0.a;
 		var tagger = _n0.b;
 		var _n1 = A2(elm$core$Dict$get, interval, state);
-		if (_n1.$ === 'Nothing') {
+		if (_n1.$ === 1) {
 			return A3(
 				elm$core$Dict$insert,
 				interval,
@@ -5766,7 +5760,7 @@ var elm$time$Time$spawnHelp = F3(
 	});
 var elm$time$Time$onEffects = F3(
 	function (router, subs, _n0) {
-		var processes = _n0.processes;
+		var processes = _n0.aB;
 		var rightStep = F3(
 			function (_n6, id, _n7) {
 				var spawns = _n7.a;
@@ -5813,7 +5807,7 @@ var elm$time$Time$onEffects = F3(
 			_Utils_Tuple3(
 				_List_Nil,
 				elm$core$Dict$empty,
-				elm$core$Task$succeed(_Utils_Tuple0)));
+				elm$core$Task$succeed(0)));
 		var spawnList = _n1.a;
 		var existingDict = _n1.b;
 		var killTask = _n1.c;
@@ -5832,8 +5826,8 @@ var elm$time$Time$onEffects = F3(
 	});
 var elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _n0 = A2(elm$core$Dict$get, interval, state.taggers);
-		if (_n0.$ === 'Nothing') {
+		var _n0 = A2(elm$core$Dict$get, interval, state.aM);
+		if (_n0.$ === 1) {
 			return elm$core$Task$succeed(state);
 		} else {
 			var taggers = _n0.a;
@@ -5876,19 +5870,19 @@ var elm$time$Time$every = F2(
 var author$project$Main$subscriptions = function (model) {
 	return A2(elm$time$Time$every, 250, author$project$Main$Tick);
 };
-var author$project$Main$Began = {$: 'Began'};
-var author$project$Main$BetweenWaves = {$: 'BetweenWaves'};
-var author$project$Main$CryingStarted = {$: 'CryingStarted'};
-var author$project$Main$CryingStopped = {$: 'CryingStopped'};
-var author$project$Main$Ended = {$: 'Ended'};
+var author$project$Main$Began = {$: 0};
+var author$project$Main$BetweenWaves = {$: 2};
+var author$project$Main$CryingStarted = {$: 2};
+var author$project$Main$CryingStopped = {$: 3};
+var author$project$Main$Ended = {$: 1};
 var author$project$Main$GracePeriod = function (a) {
-	return {$: 'GracePeriod', a: a};
+	return {$: 4, a: a};
 };
-var author$project$Main$Quiescent = {$: 'Quiescent'};
+var author$project$Main$Quiescent = {$: 1};
 var author$project$Main$Waved = function (a) {
-	return {$: 'Waved', a: a};
+	return {$: 5, a: a};
 };
-var author$project$Main$Waving = {$: 'Waving'};
+var author$project$Main$Waving = {$: 3};
 var elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5896,7 +5890,7 @@ var elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
 var elm$time$Time$posixToMillis = function (_n0) {
-	var millis = _n0.a;
+	var millis = _n0;
 	return millis;
 };
 var author$project$Main$timeDifference = F2(
@@ -5909,36 +5903,36 @@ var elm$core$Basics$ge = _Utils_ge;
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$checkTimers = function (model) {
-	var _n0 = model.state;
+	var _n0 = model.o;
 	switch (_n0.$) {
-		case 'Loading':
+		case 0:
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		case 'Quiescent':
+		case 1:
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		case 'Waving':
+		case 3:
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		case 'BetweenWaves':
+		case 2:
 			return (_Utils_cmp(
-				A2(author$project$Main$timeDifference, model.time, model.timeEntered),
-				model.config.waveTime) > -1) ? _Utils_Tuple2(
+				A2(author$project$Main$timeDifference, model.f, model.j),
+				model.e.k) > -1) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{state: author$project$Main$Waving, timeEntered: model.time}),
+					{o: author$project$Main$Waving, j: model.f}),
 				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		default:
 			var originalTime = _n0.a;
 			return (_Utils_cmp(
-				A2(author$project$Main$timeDifference, model.time, model.timeEntered),
-				model.config.graceTime) > -1) ? _Utils_Tuple2(
+				A2(author$project$Main$timeDifference, model.f, model.j),
+				model.e.l) > -1) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{state: author$project$Main$Quiescent, timeEntered: model.time}),
+					{o: author$project$Main$Quiescent, j: model.f}),
 				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	}
 };
 var author$project$Main$formatHour = F2(
 	function (config, baseHour) {
-		var hourNum = config.twelveHour ? A2(elm$core$Basics$modBy, 12, baseHour) : baseHour;
+		var hourNum = config.m ? A2(elm$core$Basics$modBy, 12, baseHour) : baseHour;
 		var hour12 = (!hourNum) ? 12 : hourNum;
 		return elm$core$String$fromInt(hour12);
 	});
@@ -5955,8 +5949,8 @@ var elm$time$Time$toAdjustedMinutesHelp = F3(
 			} else {
 				var era = eras.a;
 				var olderEras = eras.b;
-				if (_Utils_cmp(era.start, posixMinutes) < 0) {
-					return posixMinutes + era.offset;
+				if (_Utils_cmp(era.ac, posixMinutes) < 0) {
+					return posixMinutes + era.b;
 				} else {
 					var $temp$defaultOffset = defaultOffset,
 						$temp$posixMinutes = posixMinutes,
@@ -6012,29 +6006,29 @@ var elm$time$Time$toSecond = F2(
 var author$project$Main$clockTime = F2(
 	function (config, time) {
 		var second = author$project$Main$twoDigitInt(
-			A2(elm$time$Time$toSecond, config.zone, time));
+			A2(elm$time$Time$toSecond, config.N, time));
 		var minute = author$project$Main$twoDigitInt(
-			A2(elm$time$Time$toMinute, config.zone, time));
-		var baseHour = A2(elm$time$Time$toHour, config.zone, time);
+			A2(elm$time$Time$toMinute, config.N, time));
+		var baseHour = A2(elm$time$Time$toHour, config.N, time);
 		var hour = A2(author$project$Main$formatHour, config, baseHour);
-		var ampm = config.twelveHour ? ((baseHour >= 12) ? 'pm' : 'am') : '';
+		var ampm = config.m ? ((baseHour >= 12) ? 'pm' : 'am') : '';
 		return hour + (':' + (minute + (':' + (second + ampm))));
 	});
 var author$project$Main$nextRemainingMode = function (mode) {
-	switch (mode.$) {
-		case 'ClockAndTimeLeft':
-			return author$project$Main$ClockOnly;
-		case 'ClockOnly':
-			return author$project$Main$TimeLeftOnly;
+	switch (mode) {
+		case 0:
+			return 1;
+		case 1:
+			return 2;
 		default:
-			return author$project$Main$ClockAndTimeLeft;
+			return 0;
 	}
 };
 var author$project$Main$cycleRemainingMode = function (config) {
 	return _Utils_update(
 		config,
 		{
-			remainingMode: author$project$Main$nextRemainingMode(config.remainingMode)
+			q: author$project$Main$nextRemainingMode(config.q)
 		});
 };
 var author$project$Main$logEntry = F2(
@@ -6042,26 +6036,26 @@ var author$project$Main$logEntry = F2(
 		return _Utils_update(
 			model,
 			{
-				log: A2(
+				s: A2(
 					elm$core$List$cons,
-					_Utils_Tuple2(model.time, entry),
-					model.log)
+					_Utils_Tuple2(model.f, entry),
+					model.s)
 			});
 	});
 var author$project$Main$logEntryToString = F2(
 	function (config, entry) {
 		switch (entry.$) {
-			case 'Began':
+			case 0:
 				return elm$core$Maybe$Just('began');
-			case 'Ended':
+			case 1:
 				return elm$core$Maybe$Just('ended');
-			case 'CryingStarted':
+			case 2:
 				return elm$core$Maybe$Just('crying started');
-			case 'CryingStopped':
+			case 3:
 				return elm$core$Maybe$Just('crying stopped');
-			case 'CryingSquashed':
+			case 4:
 				return elm$core$Maybe$Nothing;
-			case 'Waved':
+			case 5:
 				var timeDue = entry.a;
 				return elm$core$Maybe$Just(
 					'completed wave due at ' + A2(author$project$Main$clockTime, config, timeDue));
@@ -6072,7 +6066,7 @@ var author$project$Main$logEntryToString = F2(
 	});
 var elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
+		if (!maybeValue.$) {
 			var value = maybeValue.a;
 			return callback(value);
 		} else {
@@ -6094,7 +6088,7 @@ var author$project$Main$logRowToCSV = F2(
 var elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _n0 = f(mx);
-		if (_n0.$ === 'Just') {
+		if (!_n0.$) {
 			var x = _n0.a;
 			return A2(elm$core$List$cons, x, xs);
 		} else {
@@ -6123,18 +6117,18 @@ var author$project$Main$setTwelveHour = F2(
 	function (newTwelveHour, config) {
 		return _Utils_update(
 			config,
-			{twelveHour: newTwelveHour});
+			{m: newTwelveHour});
 	});
 var author$project$Main$setZone = F2(
 	function (newZone, config) {
 		return _Utils_update(
 			config,
-			{zone: newZone});
+			{N: newZone});
 	});
-var author$project$Main$CryingSquashed = {$: 'CryingSquashed'};
+var author$project$Main$CryingSquashed = {$: 4};
 var author$project$Main$squashCryingStopped = function (model) {
-	var _n0 = model.log;
-	if (_n0.b && (_n0.a.b.$ === 'CryingStopped')) {
+	var _n0 = model.s;
+	if (_n0.b && (_n0.a.b.$ === 3)) {
 		var _n1 = _n0.a;
 		var time = _n1.a;
 		var _n2 = _n1.b;
@@ -6142,7 +6136,7 @@ var author$project$Main$squashCryingStopped = function (model) {
 		return _Utils_update(
 			model,
 			{
-				log: A2(
+				s: A2(
 					elm$core$List$cons,
 					_Utils_Tuple2(time, author$project$Main$CryingSquashed),
 					oldLog)
@@ -6152,25 +6146,23 @@ var author$project$Main$squashCryingStopped = function (model) {
 	}
 };
 var elm$core$String$toInt = _String_toInt;
-var elm$parser$Parser$Advanced$Parser = function (a) {
-	return {$: 'Parser', a: a};
-};
+var elm$parser$Parser$Advanced$Parser = elm$core$Basics$identity;
 var elm$parser$Parser$Advanced$Good = F3(
 	function (a, b, c) {
-		return {$: 'Good', a: a, b: b, c: c};
+		return {$: 0, a: a, b: b, c: c};
 	});
 var elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
 var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 	function (isGood, offset, row, col, s0) {
 		chompWhileHelp:
 		while (true) {
-			var newOffset = A3(elm$parser$Parser$Advanced$isSubChar, isGood, offset, s0.src);
+			var newOffset = A3(elm$parser$Parser$Advanced$isSubChar, isGood, offset, s0.a);
 			if (_Utils_eq(newOffset, -1)) {
 				return A3(
 					elm$parser$Parser$Advanced$Good,
-					_Utils_cmp(s0.offset, offset) < 0,
-					_Utils_Tuple0,
-					{col: col, context: s0.context, indent: s0.indent, offset: offset, row: row, src: s0.src});
+					_Utils_cmp(s0.b, offset) < 0,
+					0,
+					{ah: col, c: s0.c, d: s0.d, b: offset, aH: row, a: s0.a});
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -6201,10 +6193,9 @@ var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 		}
 	});
 var elm$parser$Parser$Advanced$chompWhile = function (isGood) {
-	return elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			return A5(elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.offset, s.row, s.col, s);
-		});
+	return function (s) {
+		return A5(elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.b, s.aH, s.ah, s);
+	};
 };
 var elm$parser$Parser$chompWhile = elm$parser$Parser$Advanced$chompWhile;
 var elm$core$Basics$always = F2(
@@ -6214,32 +6205,31 @@ var elm$core$Basics$always = F2(
 var elm$core$String$slice = _String_slice;
 var elm$parser$Parser$Advanced$Bad = F2(
 	function (a, b) {
-		return {$: 'Bad', a: a, b: b};
+		return {$: 1, a: a, b: b};
 	});
 var elm$parser$Parser$Advanced$mapChompedString = F2(
 	function (func, _n0) {
-		var parse = _n0.a;
-		return elm$parser$Parser$Advanced$Parser(
-			function (s0) {
-				var _n1 = parse(s0);
-				if (_n1.$ === 'Bad') {
-					var p = _n1.a;
-					var x = _n1.b;
-					return A2(elm$parser$Parser$Advanced$Bad, p, x);
-				} else {
-					var p = _n1.a;
-					var a = _n1.b;
-					var s1 = _n1.c;
-					return A3(
-						elm$parser$Parser$Advanced$Good,
-						p,
-						A2(
-							func,
-							A3(elm$core$String$slice, s0.offset, s1.offset, s0.src),
-							a),
-						s1);
-				}
-			});
+		var parse = _n0;
+		return function (s0) {
+			var _n1 = parse(s0);
+			if (_n1.$ === 1) {
+				var p = _n1.a;
+				var x = _n1.b;
+				return A2(elm$parser$Parser$Advanced$Bad, p, x);
+			} else {
+				var p = _n1.a;
+				var a = _n1.b;
+				var s1 = _n1.c;
+				return A3(
+					elm$parser$Parser$Advanced$Good,
+					p,
+					A2(
+						func,
+						A3(elm$core$String$slice, s0.b, s1.b, s0.a),
+						a),
+					s1);
+			}
+		};
 	});
 var elm$parser$Parser$Advanced$getChompedString = function (parser) {
 	return A2(elm$parser$Parser$Advanced$mapChompedString, elm$core$Basics$always, parser);
@@ -6247,32 +6237,31 @@ var elm$parser$Parser$Advanced$getChompedString = function (parser) {
 var elm$parser$Parser$getChompedString = elm$parser$Parser$Advanced$getChompedString;
 var elm$parser$Parser$Advanced$map = F2(
 	function (func, _n0) {
-		var parse = _n0.a;
-		return elm$parser$Parser$Advanced$Parser(
-			function (s0) {
-				var _n1 = parse(s0);
-				if (_n1.$ === 'Good') {
-					var p = _n1.a;
-					var a = _n1.b;
-					var s1 = _n1.c;
-					return A3(
-						elm$parser$Parser$Advanced$Good,
-						p,
-						func(a),
-						s1);
-				} else {
-					var p = _n1.a;
-					var x = _n1.b;
-					return A2(elm$parser$Parser$Advanced$Bad, p, x);
-				}
-			});
+		var parse = _n0;
+		return function (s0) {
+			var _n1 = parse(s0);
+			if (!_n1.$) {
+				var p = _n1.a;
+				var a = _n1.b;
+				var s1 = _n1.c;
+				return A3(
+					elm$parser$Parser$Advanced$Good,
+					p,
+					func(a),
+					s1);
+			} else {
+				var p = _n1.a;
+				var x = _n1.b;
+				return A2(elm$parser$Parser$Advanced$Bad, p, x);
+			}
+		};
 	});
 var elm$parser$Parser$map = elm$parser$Parser$Advanced$map;
 var author$project$Main$relaxedInt = A2(
 	elm$parser$Parser$map,
 	function (str) {
 		var _n0 = elm$core$String$toInt(str);
-		if (_n0.$ === 'Nothing') {
+		if (_n0.$ === 1) {
 			return 0;
 		} else {
 			var n = _n0.a;
@@ -6281,67 +6270,65 @@ var author$project$Main$relaxedInt = A2(
 	},
 	elm$parser$Parser$getChompedString(
 		elm$parser$Parser$chompWhile(elm$core$Char$isDigit)));
-var elm$parser$Parser$ExpectingEnd = {$: 'ExpectingEnd'};
+var elm$parser$Parser$ExpectingEnd = {$: 10};
 var elm$parser$Parser$Advanced$AddRight = F2(
 	function (a, b) {
-		return {$: 'AddRight', a: a, b: b};
+		return {$: 1, a: a, b: b};
 	});
 var elm$parser$Parser$Advanced$DeadEnd = F4(
 	function (row, col, problem, contextStack) {
-		return {col: col, contextStack: contextStack, problem: problem, row: row};
+		return {ah: col, aT: contextStack, az: problem, aH: row};
 	});
-var elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
+var elm$parser$Parser$Advanced$Empty = {$: 0};
 var elm$parser$Parser$Advanced$fromState = F2(
 	function (s, x) {
 		return A2(
 			elm$parser$Parser$Advanced$AddRight,
 			elm$parser$Parser$Advanced$Empty,
-			A4(elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
+			A4(elm$parser$Parser$Advanced$DeadEnd, s.aH, s.ah, x, s.c));
 	});
 var elm$parser$Parser$Advanced$end = function (x) {
-	return elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			return _Utils_eq(
-				elm$core$String$length(s.src),
-				s.offset) ? A3(elm$parser$Parser$Advanced$Good, false, _Utils_Tuple0, s) : A2(
-				elm$parser$Parser$Advanced$Bad,
-				false,
-				A2(elm$parser$Parser$Advanced$fromState, s, x));
-		});
+	return function (s) {
+		return _Utils_eq(
+			elm$core$String$length(s.a),
+			s.b) ? A3(elm$parser$Parser$Advanced$Good, false, 0, s) : A2(
+			elm$parser$Parser$Advanced$Bad,
+			false,
+			A2(elm$parser$Parser$Advanced$fromState, s, x));
+	};
 };
 var elm$parser$Parser$end = elm$parser$Parser$Advanced$end(elm$parser$Parser$ExpectingEnd);
 var elm$parser$Parser$Advanced$map2 = F3(
 	function (func, _n0, _n1) {
-		var parseA = _n0.a;
-		var parseB = _n1.a;
-		return elm$parser$Parser$Advanced$Parser(
-			function (s0) {
-				var _n2 = parseA(s0);
-				if (_n2.$ === 'Bad') {
-					var p = _n2.a;
-					var x = _n2.b;
-					return A2(elm$parser$Parser$Advanced$Bad, p, x);
+		var parseA = _n0;
+		var parseB = _n1;
+		return function (s0) {
+			var _n2 = parseA(s0);
+			if (_n2.$ === 1) {
+				var p = _n2.a;
+				var x = _n2.b;
+				return A2(elm$parser$Parser$Advanced$Bad, p, x);
+			} else {
+				var p1 = _n2.a;
+				var a = _n2.b;
+				var s1 = _n2.c;
+				var _n3 = parseB(s1);
+				if (_n3.$ === 1) {
+					var p2 = _n3.a;
+					var x = _n3.b;
+					return A2(elm$parser$Parser$Advanced$Bad, p1 || p2, x);
 				} else {
-					var p1 = _n2.a;
-					var a = _n2.b;
-					var s1 = _n2.c;
-					var _n3 = parseB(s1);
-					if (_n3.$ === 'Bad') {
-						var p2 = _n3.a;
-						var x = _n3.b;
-						return A2(elm$parser$Parser$Advanced$Bad, p1 || p2, x);
-					} else {
-						var p2 = _n3.a;
-						var b = _n3.b;
-						var s2 = _n3.c;
-						return A3(
-							elm$parser$Parser$Advanced$Good,
-							p1 || p2,
-							A2(func, a, b),
-							s2);
-					}
+					var p2 = _n3.a;
+					var b = _n3.b;
+					var s2 = _n3.c;
+					return A3(
+						elm$parser$Parser$Advanced$Good,
+						p1 || p2,
+						A2(func, a, b),
+						s2);
 				}
-			});
+			}
+		};
 	});
 var elm$parser$Parser$Advanced$ignorer = F2(
 	function (keepParser, ignoreParser) {
@@ -6355,7 +6342,7 @@ var elm$parser$Parser$Advanced$keeper = F2(
 var elm$parser$Parser$keeper = elm$parser$Parser$Advanced$keeper;
 var elm$parser$Parser$Advanced$Append = F2(
 	function (a, b) {
-		return {$: 'Append', a: a, b: b};
+		return {$: 2, a: a, b: b};
 	});
 var elm$parser$Parser$Advanced$oneOfHelp = F3(
 	function (s0, bag, parsers) {
@@ -6364,10 +6351,10 @@ var elm$parser$Parser$Advanced$oneOfHelp = F3(
 			if (!parsers.b) {
 				return A2(elm$parser$Parser$Advanced$Bad, false, bag);
 			} else {
-				var parse = parsers.a.a;
+				var parse = parsers.a;
 				var remainingParsers = parsers.b;
 				var _n1 = parse(s0);
-				if (_n1.$ === 'Good') {
+				if (!_n1.$) {
 					var step = _n1;
 					return step;
 				} else {
@@ -6390,46 +6377,43 @@ var elm$parser$Parser$Advanced$oneOfHelp = F3(
 		}
 	});
 var elm$parser$Parser$Advanced$oneOf = function (parsers) {
-	return elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			return A3(elm$parser$Parser$Advanced$oneOfHelp, s, elm$parser$Parser$Advanced$Empty, parsers);
-		});
+	return function (s) {
+		return A3(elm$parser$Parser$Advanced$oneOfHelp, s, elm$parser$Parser$Advanced$Empty, parsers);
+	};
 };
 var elm$parser$Parser$oneOf = elm$parser$Parser$Advanced$oneOf;
 var elm$parser$Parser$Advanced$succeed = function (a) {
-	return elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			return A3(elm$parser$Parser$Advanced$Good, false, a, s);
-		});
+	return function (s) {
+		return A3(elm$parser$Parser$Advanced$Good, false, a, s);
+	};
 };
 var elm$parser$Parser$succeed = elm$parser$Parser$Advanced$succeed;
 var elm$parser$Parser$ExpectingSymbol = function (a) {
-	return {$: 'ExpectingSymbol', a: a};
+	return {$: 8, a: a};
 };
 var elm$parser$Parser$Advanced$Token = F2(
 	function (a, b) {
-		return {$: 'Token', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var elm$parser$Parser$Advanced$isSubString = _Parser_isSubString;
 var elm$parser$Parser$Advanced$token = function (_n0) {
 	var str = _n0.a;
 	var expecting = _n0.b;
 	var progress = !elm$core$String$isEmpty(str);
-	return elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			var _n1 = A5(elm$parser$Parser$Advanced$isSubString, str, s.offset, s.row, s.col, s.src);
-			var newOffset = _n1.a;
-			var newRow = _n1.b;
-			var newCol = _n1.c;
-			return _Utils_eq(newOffset, -1) ? A2(
-				elm$parser$Parser$Advanced$Bad,
-				false,
-				A2(elm$parser$Parser$Advanced$fromState, s, expecting)) : A3(
-				elm$parser$Parser$Advanced$Good,
-				progress,
-				_Utils_Tuple0,
-				{col: newCol, context: s.context, indent: s.indent, offset: newOffset, row: newRow, src: s.src});
-		});
+	return function (s) {
+		var _n1 = A5(elm$parser$Parser$Advanced$isSubString, str, s.b, s.aH, s.ah, s.a);
+		var newOffset = _n1.a;
+		var newRow = _n1.b;
+		var newCol = _n1.c;
+		return _Utils_eq(newOffset, -1) ? A2(
+			elm$parser$Parser$Advanced$Bad,
+			false,
+			A2(elm$parser$Parser$Advanced$fromState, s, expecting)) : A3(
+			elm$parser$Parser$Advanced$Good,
+			progress,
+			0,
+			{ah: newCol, c: s.c, d: s.d, b: newOffset, aH: newRow, a: s.a});
+	};
 };
 var elm$parser$Parser$Advanced$symbol = elm$parser$Parser$Advanced$token;
 var elm$parser$Parser$symbol = function (str) {
@@ -6446,10 +6430,10 @@ var author$project$Main$parseHMS = A2(
 		elm$parser$Parser$succeed(
 			F2(
 				function (i1, mi23) {
-					if (mi23.$ === 'Nothing') {
+					if (mi23.$ === 1) {
 						return _Utils_Tuple3(0, 0, i1);
 					} else {
-						if (mi23.a.b.$ === 'Nothing') {
+						if (mi23.a.b.$ === 1) {
 							var _n1 = mi23.a;
 							var i2 = _n1.a;
 							var _n2 = _n1.b;
@@ -6499,19 +6483,19 @@ var author$project$Main$parseHMS = A2(
 		elm$parser$Parser$end));
 var elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
-		return {col: col, problem: problem, row: row};
+		return {ah: col, az: problem, aH: row};
 	});
 var elm$parser$Parser$problemToDeadEnd = function (p) {
-	return A3(elm$parser$Parser$DeadEnd, p.row, p.col, p.problem);
+	return A3(elm$parser$Parser$DeadEnd, p.aH, p.ah, p.az);
 };
 var elm$parser$Parser$Advanced$bagToList = F2(
 	function (bag, list) {
 		bagToList:
 		while (true) {
 			switch (bag.$) {
-				case 'Empty':
+				case 0:
 					return list;
-				case 'AddRight':
+				case 1:
 					var bag1 = bag.a;
 					var x = bag.b;
 					var $temp$bag = bag1,
@@ -6532,10 +6516,10 @@ var elm$parser$Parser$Advanced$bagToList = F2(
 	});
 var elm$parser$Parser$Advanced$run = F2(
 	function (_n0, src) {
-		var parse = _n0.a;
+		var parse = _n0;
 		var _n1 = parse(
-			{col: 1, context: _List_Nil, indent: 1, offset: 0, row: 1, src: src});
-		if (_n1.$ === 'Good') {
+			{ah: 1, c: _List_Nil, d: 1, b: 0, aH: 1, a: src});
+		if (!_n1.$) {
 			var value = _n1.b;
 			return elm$core$Result$Ok(value);
 		} else {
@@ -6547,7 +6531,7 @@ var elm$parser$Parser$Advanced$run = F2(
 var elm$parser$Parser$run = F2(
 	function (parser, source) {
 		var _n0 = A2(elm$parser$Parser$Advanced$run, parser, source);
-		if (_n0.$ === 'Ok') {
+		if (!_n0.$) {
 			var a = _n0.a;
 			return elm$core$Result$Ok(a);
 		} else {
@@ -6558,7 +6542,7 @@ var elm$parser$Parser$run = F2(
 	});
 var author$project$Main$tryHMSToMillis = function (str) {
 	var _n0 = A2(elm$parser$Parser$run, author$project$Main$parseHMS, str);
-	if (_n0.$ === 'Err') {
+	if (_n0.$ === 1) {
 		return elm$core$Maybe$Nothing;
 	} else {
 		var _n1 = _n0.a;
@@ -6571,10 +6555,10 @@ var author$project$Main$tryHMSToMillis = function (str) {
 var author$project$Main$saveSettings = _Platform_outgoingPort('saveSettings', elm$core$Basics$identity);
 var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Main$remainingModeEncoder = function (mode) {
-	switch (mode.$) {
-		case 'ClockAndTimeLeft':
+	switch (mode) {
+		case 0:
 			return elm$json$Json$Encode$string('ClockAndTimeLeft');
-		case 'ClockOnly':
+		case 1:
 			return elm$json$Json$Encode$string('ClockOnly');
 		default:
 			return elm$json$Json$Encode$string('TimeLeftOnly');
@@ -6592,7 +6576,7 @@ var elm$json$Json$Encode$object = function (pairs) {
 					var v = _n0.b;
 					return A3(_Json_addField, k, v, obj);
 				}),
-			_Json_emptyObject(_Utils_Tuple0),
+			_Json_emptyObject(0),
 			pairs));
 };
 var author$project$Main$settingsEncoder = function (settings) {
@@ -6601,47 +6585,47 @@ var author$project$Main$settingsEncoder = function (settings) {
 			[
 				_Utils_Tuple2(
 				'waveTime',
-				elm$json$Json$Encode$int(settings.waveTime)),
+				elm$json$Json$Encode$int(settings.k)),
 				_Utils_Tuple2(
 				'graceTime',
-				elm$json$Json$Encode$int(settings.graceTime)),
+				elm$json$Json$Encode$int(settings.l)),
 				_Utils_Tuple2(
 				'twelveHour',
-				elm$json$Json$Encode$bool(settings.twelveHour)),
+				elm$json$Json$Encode$bool(settings.m)),
 				_Utils_Tuple2(
 				'remainingMode',
-				author$project$Main$remainingModeEncoder(settings.remainingMode))
+				author$project$Main$remainingModeEncoder(settings.q))
 			]));
 };
 var author$project$Main$saveConfig = function (config) {
 	return author$project$Main$saveSettings(
 		author$project$Main$settingsEncoder(
-			{graceTime: config.graceTime, remainingMode: config.remainingMode, twelveHour: config.twelveHour, waveTime: config.waveTime}));
+			{l: config.l, q: config.q, m: config.m, k: config.k}));
 };
 var author$project$Main$updateAndSaveConfig = F2(
 	function (newConfig, model) {
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
-				{config: newConfig}),
+				{e: newConfig}),
 			author$project$Main$saveConfig(newConfig));
 	});
 var author$project$Main$updateGraceTime = F2(
 	function (entered, config) {
 		return _Utils_update(
 			config,
-			{enteredGraceTime: entered});
+			{F: entered});
 	});
 var author$project$Main$updateWaveTime = F2(
 	function (entered, config) {
 		return _Utils_update(
 			config,
-			{enteredWaveTime: entered});
+			{G: entered});
 	});
 var elm$core$Basics$never = function (_n0) {
 	never:
 	while (true) {
-		var nvr = _n0.a;
+		var nvr = _n0;
 		var $temp$_n0 = nvr;
 		_n0 = $temp$_n0;
 		continue never;
@@ -6657,33 +6641,33 @@ var elm$file$File$Download$string = F3(
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'Tick':
+			case 0:
 				var newTime = msg.a;
 				return author$project$Main$checkTimers(
 					_Utils_update(
 						model,
-						{time: newTime}));
-			case 'InitializeTime':
+						{f: newTime}));
+			case 1:
 				var newZone = msg.a;
 				var newTime = msg.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							config: A2(author$project$Main$setZone, newZone, model.config),
-							time: newTime
+							e: A2(author$project$Main$setZone, newZone, model.e),
+							f: newTime
 						}),
 					elm$core$Platform$Cmd$none);
-			case 'Begin':
+			case 2:
 				return _Utils_Tuple2(
 					A2(
 						author$project$Main$logEntry,
 						author$project$Main$Began,
 						_Utils_update(
 							model,
-							{state: author$project$Main$Quiescent, timeBegun: model.time, timeEntered: model.time})),
+							{o: author$project$Main$Quiescent, C: model.f, j: model.f})),
 					elm$core$Platform$Cmd$none);
-			case 'End':
+			case 3:
 				return _Utils_Tuple2(
 					A2(
 						author$project$Main$logEntry,
@@ -6691,22 +6675,22 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								priorMillis: model.priorMillis + A2(author$project$Main$timeDifference, model.time, model.timeBegun),
-								state: author$project$Main$Loading,
-								timeBegun: elm$time$Time$millisToPosix(0),
-								timeEntered: model.time
+								Q: model.Q + A2(author$project$Main$timeDifference, model.f, model.C),
+								o: author$project$Main$Loading,
+								C: elm$time$Time$millisToPosix(0),
+								j: model.f
 							})),
 					elm$core$Platform$Cmd$none);
-			case 'StartWave':
+			case 4:
 				return _Utils_Tuple2(
 					A2(
 						author$project$Main$logEntry,
 						author$project$Main$CryingStarted,
 						_Utils_update(
 							model,
-							{state: author$project$Main$BetweenWaves, timeEntered: model.time})),
+							{o: author$project$Main$BetweenWaves, j: model.f})),
 					elm$core$Platform$Cmd$none);
-			case 'EndWave':
+			case 5:
 				return _Utils_Tuple2(
 					A2(
 						author$project$Main$logEntry,
@@ -6714,61 +6698,61 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								state: author$project$Main$GracePeriod(model.timeEntered),
-								timeEntered: model.time
+								o: author$project$Main$GracePeriod(model.j),
+								j: model.f
 							})),
 					elm$core$Platform$Cmd$none);
-			case 'ResumeWave':
+			case 6:
 				var originalTimeEntered = msg.a;
 				return _Utils_Tuple2(
 					author$project$Main$squashCryingStopped(
 						_Utils_update(
 							model,
-							{state: author$project$Main$BetweenWaves, timeEntered: originalTimeEntered})),
+							{o: author$project$Main$BetweenWaves, j: originalTimeEntered})),
 					elm$core$Platform$Cmd$none);
-			case 'Wave':
+			case 7:
 				return _Utils_Tuple2(
 					A2(
 						author$project$Main$logEntry,
-						author$project$Main$Waved(model.timeEntered),
+						author$project$Main$Waved(model.j),
 						_Utils_update(
 							model,
-							{state: author$project$Main$BetweenWaves, timeEntered: model.time})),
+							{o: author$project$Main$BetweenWaves, j: model.f})),
 					elm$core$Platform$Cmd$none);
-			case 'DownloadLog':
+			case 8:
 				return _Utils_Tuple2(
 					model,
 					function () {
-						var now = A2(author$project$Main$clockTime, model.config, model.time);
+						var now = A2(author$project$Main$clockTime, model.e, model.f);
 						var filename = 'sleep-' + (now + '.csv');
 						return A3(
 							elm$file$File$Download$string,
 							filename,
 							'text/csv',
-							A2(author$project$Main$logToCSV, model.config, model.log));
+							A2(author$project$Main$logToCSV, model.e, model.s));
 					}());
-			case 'ConfigUpdateWaveTime':
+			case 9:
 				var newWaveTime = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							config: A2(author$project$Main$updateWaveTime, newWaveTime, model.config)
+							e: A2(author$project$Main$updateWaveTime, newWaveTime, model.e)
 						}),
 					elm$core$Platform$Cmd$none);
-			case 'ConfigUpdateGraceTime':
+			case 10:
 				var newGraceTime = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							config: A2(author$project$Main$updateGraceTime, newGraceTime, model.config)
+							e: A2(author$project$Main$updateGraceTime, newGraceTime, model.e)
 						}),
 					elm$core$Platform$Cmd$none);
-			case 'ConfigSetWaveTime':
-				var config = model.config;
-				var _n1 = author$project$Main$tryHMSToMillis(config.enteredWaveTime);
-				if (_n1.$ === 'Nothing') {
+			case 11:
+				var config = model.e;
+				var _n1 = author$project$Main$tryHMSToMillis(config.G);
+				if (_n1.$ === 1) {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				} else {
 					var _new = _n1.a;
@@ -6777,15 +6761,15 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							config,
 							{
-								enteredWaveTime: author$project$Main$millisToHMSShort(_new),
-								waveTime: _new
+								G: author$project$Main$millisToHMSShort(_new),
+								k: _new
 							}),
 						model);
 				}
-			case 'ConfigSetGraceTime':
-				var config = model.config;
-				var _n2 = author$project$Main$tryHMSToMillis(config.enteredGraceTime);
-				if (_n2.$ === 'Nothing') {
+			case 12:
+				var config = model.e;
+				var _n2 = author$project$Main$tryHMSToMillis(config.F);
+				if (_n2.$ === 1) {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				} else {
 					var _new = _n2.a;
@@ -6794,21 +6778,21 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							config,
 							{
-								enteredGraceTime: author$project$Main$millisToHMSShort(_new),
-								graceTime: _new
+								F: author$project$Main$millisToHMSShort(_new),
+								l: _new
 							}),
 						model);
 				}
-			case 'ConfigSetTwelveHour':
+			case 13:
 				var newTwelveHour = msg.a;
 				return A2(
 					author$project$Main$updateAndSaveConfig,
-					A2(author$project$Main$setTwelveHour, newTwelveHour, model.config),
+					A2(author$project$Main$setTwelveHour, newTwelveHour, model.e),
 					model);
 			default:
 				return A2(
 					author$project$Main$updateAndSaveConfig,
-					author$project$Main$cycleRemainingMode(model.config),
+					author$project$Main$cycleRemainingMode(model.e),
 					model);
 		}
 	});
@@ -6816,11 +6800,11 @@ var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
-		case 'Normal':
+		case 0:
 			return 0;
-		case 'MayStopPropagation':
+		case 1:
 			return 1;
-		case 'MayPreventDefault':
+		case 2:
 			return 2;
 		default:
 			return 3;
@@ -6847,20 +6831,20 @@ var author$project$Main$row = F2(
 			_List_fromArray(
 				[cts]));
 	});
-var author$project$Main$Begin = {$: 'Begin'};
-var author$project$Main$End = {$: 'End'};
-var author$project$Main$EndWave = {$: 'EndWave'};
+var author$project$Main$Begin = {$: 2};
+var author$project$Main$End = {$: 3};
+var author$project$Main$EndWave = {$: 5};
 var author$project$Main$ResumeWave = function (a) {
-	return {$: 'ResumeWave', a: a};
+	return {$: 6, a: a};
 };
-var author$project$Main$StartWave = {$: 'StartWave'};
-var author$project$Main$Wave = {$: 'Wave'};
+var author$project$Main$StartWave = {$: 4};
+var author$project$Main$Wave = {$: 7};
 var author$project$Main$centered = elm$html$Html$Attributes$class('six columns offset-by-three');
 var elm$html$Html$button = _VirtualDom_node('button');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
+	return {$: 0, a: a};
 };
 var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var elm$html$Html$Events$on = F2(
@@ -6881,9 +6865,9 @@ var author$project$Main$viewActions = function (model) {
 		return _List_fromArray(
 			[author$project$Main$centered, handler]);
 	};
-	var _n0 = model.state;
+	var _n0 = model.o;
 	switch (_n0.$) {
-		case 'Loading':
+		case 0:
 			return A2(
 				elm$html$Html$button,
 				actionClass(
@@ -6892,7 +6876,7 @@ var author$project$Main$viewActions = function (model) {
 					[
 						elm$html$Html$text('begin')
 					]));
-		case 'Quiescent':
+		case 1:
 			return A2(
 				elm$html$Html$div,
 				_List_Nil,
@@ -6915,7 +6899,7 @@ var author$project$Main$viewActions = function (model) {
 								elm$html$Html$text('end')
 							]))
 					]));
-		case 'BetweenWaves':
+		case 2:
 			return A2(
 				elm$html$Html$button,
 				actionClass(
@@ -6924,7 +6908,7 @@ var author$project$Main$viewActions = function (model) {
 					[
 						elm$html$Html$text('crying stopped')
 					]));
-		case 'Waving':
+		case 3:
 			return A2(
 				elm$html$Html$button,
 				actionClass(
@@ -6958,19 +6942,19 @@ var author$project$Main$viewClock = function (model) {
 		_List_fromArray(
 			[
 				elm$html$Html$text(
-				A2(author$project$Main$clockTime, model.config, model.time))
+				A2(author$project$Main$clockTime, model.e, model.f))
 			]));
 };
-var author$project$Main$ConfigSetGraceTime = {$: 'ConfigSetGraceTime'};
+var author$project$Main$ConfigSetGraceTime = {$: 12};
 var author$project$Main$ConfigSetTwelveHour = function (a) {
-	return {$: 'ConfigSetTwelveHour', a: a};
+	return {$: 13, a: a};
 };
-var author$project$Main$ConfigSetWaveTime = {$: 'ConfigSetWaveTime'};
+var author$project$Main$ConfigSetWaveTime = {$: 11};
 var author$project$Main$ConfigUpdateGraceTime = function (a) {
-	return {$: 'ConfigUpdateGraceTime', a: a};
+	return {$: 10, a: a};
 };
 var author$project$Main$ConfigUpdateWaveTime = function (a) {
-	return {$: 'ConfigUpdateWaveTime', a: a};
+	return {$: 9, a: a};
 };
 var elm$html$Html$h5 = _VirtualDom_node('h5');
 var author$project$Main$rowLabel = function (lbl) {
@@ -6987,7 +6971,7 @@ var author$project$Main$rowLabel = function (lbl) {
 };
 var author$project$Main$isValidHMS = function (str) {
 	var _n0 = A2(elm$parser$Parser$run, author$project$Main$parseHMS, str);
-	if (_n0.$ === 'Err') {
+	if (_n0.$ === 1) {
 		return false;
 	} else {
 		var _n1 = _n0.a;
@@ -7029,7 +7013,7 @@ var elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
+	return {$: 1, a: a};
 };
 var elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
@@ -7135,10 +7119,10 @@ var author$project$Main$viewConfig = function (config) {
 					author$project$Main$timeInput,
 					config,
 					function ($) {
-						return $.enteredWaveTime;
+						return $.G;
 					},
 					function ($) {
-						return $.waveTime;
+						return $.k;
 					},
 					'config-wave-duration',
 					'Wave duration (H:M:S)',
@@ -7154,10 +7138,10 @@ var author$project$Main$viewConfig = function (config) {
 					author$project$Main$timeInput,
 					config,
 					function ($) {
-						return $.enteredGraceTime;
+						return $.F;
 					},
 					function ($) {
-						return $.graceTime;
+						return $.l;
 					},
 					'config-grace-time',
 					'Grace period (H:M:S)',
@@ -7184,7 +7168,7 @@ var author$project$Main$viewConfig = function (config) {
 										elm$html$Html$Attributes$id('config-twelve-hour12'),
 										elm$html$Html$Attributes$name('config-twelve-hour'),
 										elm$html$Html$Attributes$type_('radio'),
-										elm$html$Html$Attributes$checked(config.twelveHour),
+										elm$html$Html$Attributes$checked(config.m),
 										elm$html$Html$Events$onCheck(author$project$Main$ConfigSetTwelveHour)
 									]),
 								_List_Nil),
@@ -7211,7 +7195,7 @@ var author$project$Main$viewConfig = function (config) {
 										elm$html$Html$Attributes$id('config-twelve-hour24'),
 										elm$html$Html$Attributes$name('config-twelve-hour'),
 										elm$html$Html$Attributes$type_('radio'),
-										elm$html$Html$Attributes$checked(!config.twelveHour),
+										elm$html$Html$Attributes$checked(!config.m),
 										elm$html$Html$Events$onCheck(
 										A2(elm$core$Basics$composeR, elm$core$Basics$not, author$project$Main$ConfigSetTwelveHour))
 									]),
@@ -7232,7 +7216,7 @@ var author$project$Main$viewConfig = function (config) {
 };
 var author$project$Main$isWaved = function (_n0) {
 	var entry = _n0.b;
-	if (entry.$ === 'Waved') {
+	if (entry.$ === 5) {
 		return true;
 	} else {
 		return false;
@@ -7240,12 +7224,12 @@ var author$project$Main$isWaved = function (_n0) {
 };
 var author$project$Main$countWaves = function (model) {
 	return elm$core$List$length(
-		A2(elm$core$List$filter, author$project$Main$isWaved, model.log));
+		A2(elm$core$List$filter, author$project$Main$isWaved, model.s));
 };
 var elm$core$Basics$neq = _Utils_notEqual;
 var author$project$Main$hasBegun = function (model) {
 	return !_Utils_eq(
-		model.timeBegun,
+		model.C,
 		elm$time$Time$millisToPosix(0));
 };
 var author$project$Main$millisToHMSLong = function (millis) {
@@ -7299,7 +7283,7 @@ var author$project$Main$viewInfo = function (model) {
 						elm$html$Html$text('Total time: '),
 						elm$html$Html$text(
 						author$project$Main$millisToHMSLong(
-							A2(author$project$Main$timeDifference, model.time, model.timeBegun) + model.priorMillis))
+							A2(author$project$Main$timeDifference, model.f, model.C) + model.Q))
 					])),
 				A2(
 				elm$html$Html$Lazy$lazy,
@@ -7307,7 +7291,7 @@ var author$project$Main$viewInfo = function (model) {
 				author$project$Main$countWaves(model))
 			]) : _List_Nil);
 };
-var author$project$Main$DownloadLog = {$: 'DownloadLog'};
+var author$project$Main$DownloadLog = {$: 8};
 var elm$html$Html$s = _VirtualDom_node('s');
 var elm$html$Html$td = _VirtualDom_node('td');
 var elm$html$Html$tr = _VirtualDom_node('tr');
@@ -7342,27 +7326,27 @@ var author$project$Main$viewLogEntry = F2(
 						]),
 					function () {
 						switch (entry.$) {
-							case 'Began':
+							case 0:
 								return _List_fromArray(
 									[
 										elm$html$Html$text('began')
 									]);
-							case 'Ended':
+							case 1:
 								return _List_fromArray(
 									[
 										elm$html$Html$text('ended')
 									]);
-							case 'CryingStarted':
+							case 2:
 								return _List_fromArray(
 									[
 										elm$html$Html$text('crying started')
 									]);
-							case 'CryingStopped':
+							case 3:
 								return _List_fromArray(
 									[
 										elm$html$Html$text('crying stopped')
 									]);
-							case 'CryingSquashed':
+							case 4:
 								return _List_fromArray(
 									[
 										A2(
@@ -7373,7 +7357,7 @@ var author$project$Main$viewLogEntry = F2(
 												elm$html$Html$text('crying stopped')
 											]))
 									]);
-							case 'Waved':
+							case 5:
 								var timeDue = entry.a;
 								return _List_fromArray(
 									[
@@ -7472,17 +7456,17 @@ var author$project$Main$viewLog = F2(
 	});
 var author$project$Main$computeTimeLeft = F3(
 	function (model, timeStarted, duration) {
-		var elapsed = A2(author$project$Main$timeDifference, model.time, timeStarted);
+		var elapsed = A2(author$project$Main$timeDifference, model.f, timeStarted);
 		var remaining = duration - elapsed;
 		var targetTime = elm$time$Time$millisToPosix(
-			elm$time$Time$posixToMillis(model.time) + remaining);
-		return {remaining: remaining, targetTime: targetTime};
+			elm$time$Time$posixToMillis(model.f) + remaining);
+		return {X: remaining, T: targetTime};
 	});
-var author$project$Main$ConfigCycleRemaining = {$: 'ConfigCycleRemaining'};
+var author$project$Main$ConfigCycleRemaining = {$: 14};
 var author$project$Main$targetTimeClock = F2(
 	function (config, _n0) {
-		var remaining = _n0.remaining;
-		var targetTime = _n0.targetTime;
+		var remaining = _n0.X;
+		var targetTime = _n0.T;
 		return A2(
 			elm$html$Html$h1,
 			_List_fromArray(
@@ -7498,8 +7482,8 @@ var author$project$Main$targetTimeClock = F2(
 var elm$html$Html$h4 = _VirtualDom_node('h4');
 var author$project$Main$timeLeft = F2(
 	function (_n0, msg) {
-		var remaining = _n0.remaining;
-		var targetTime = _n0.targetTime;
+		var remaining = _n0.X;
+		var targetTime = _n0.T;
 		return A2(
 			elm$html$Html$h4,
 			_List_fromArray(
@@ -7514,9 +7498,9 @@ var author$project$Main$timeLeft = F2(
 	});
 var author$project$Main$waveDue = F2(
 	function (model, _n0) {
-		var targetTime = _n0.targetTime;
+		var targetTime = _n0.T;
 		return _Utils_cmp(
-			elm$time$Time$posixToMillis(model.time),
+			elm$time$Time$posixToMillis(model.f),
 			elm$time$Time$posixToMillis(targetTime)) > -1;
 	});
 var author$project$Main$remainingTime = F2(
@@ -7529,7 +7513,7 @@ var author$project$Main$remainingTime = F2(
 				[
 					elm$html$Html$text('next wave')
 				]));
-		var clock = A2(author$project$Main$targetTimeClock, model.config, computed);
+		var clock = A2(author$project$Main$targetTimeClock, model.e, computed);
 		return A2(
 			elm$html$Html$div,
 			_List_fromArray(
@@ -7553,12 +7537,12 @@ var author$project$Main$remainingTime = F2(
 								]))
 						]);
 				} else {
-					var _n0 = model.config.remainingMode;
-					switch (_n0.$) {
-						case 'ClockAndTimeLeft':
+					var _n0 = model.e.q;
+					switch (_n0) {
+						case 0:
 							return _List_fromArray(
 								[lbl, clock, left]);
-						case 'ClockOnly':
+						case 1:
 							return _List_fromArray(
 								[lbl, clock]);
 						default:
@@ -7576,14 +7560,14 @@ var author$project$Main$viewRemaining = function (model) {
 				elm$html$Html$Attributes$class('ten columns offset-by-one')
 			]),
 		function () {
-			var _n0 = model.state;
+			var _n0 = model.o;
 			switch (_n0.$) {
-				case 'Loading':
+				case 0:
 					return _List_Nil;
-				case 'Quiescent':
+				case 1:
 					return _List_Nil;
-				case 'BetweenWaves':
-					var computed = A3(author$project$Main$computeTimeLeft, model, model.timeEntered, model.config.waveTime);
+				case 2:
+					var computed = A3(author$project$Main$computeTimeLeft, model, model.j, model.e.k);
 					return _List_fromArray(
 						[
 							A2(
@@ -7597,7 +7581,7 @@ var author$project$Main$viewRemaining = function (model) {
 									A2(author$project$Main$remainingTime, model, computed)
 								]))
 						]);
-				case 'Waving':
+				case 3:
 					return _List_fromArray(
 						[
 							A2(
@@ -7613,7 +7597,7 @@ var author$project$Main$viewRemaining = function (model) {
 						]);
 				default:
 					var originalTimeEntered = _n0.a;
-					var computed = A3(author$project$Main$computeTimeLeft, model, originalTimeEntered, model.config.waveTime);
+					var computed = A3(author$project$Main$computeTimeLeft, model, originalTimeEntered, model.e.k);
 					return _List_fromArray(
 						[
 							A2(
@@ -7636,7 +7620,7 @@ var author$project$Main$viewRemaining = function (model) {
 								[
 									A2(
 									author$project$Main$timeLeft,
-									A3(author$project$Main$computeTimeLeft, model, model.timeEntered, model.config.graceTime),
+									A3(author$project$Main$computeTimeLeft, model, model.j, model.e.l),
 									'left in grace period')
 								]))
 						]);
@@ -7670,25 +7654,23 @@ var author$project$Main$view = function (model) {
 				author$project$Main$row,
 				'info',
 				author$project$Main$viewInfo(model)),
-				A3(elm$html$Html$Lazy$lazy2, author$project$Main$viewLog, model.config, model.log),
+				A3(elm$html$Html$Lazy$lazy2, author$project$Main$viewLog, model.e, model.s),
 				A2(
 				elm$html$Html$Lazy$lazy,
 				A2(
 					elm$core$Basics$composeR,
 					author$project$Main$viewConfig,
 					author$project$Main$row('config')),
-				model.config)
+				model.e)
 			]));
 };
 var elm$browser$Browser$External = function (a) {
-	return {$: 'External', a: a};
+	return {$: 1, a: a};
 };
 var elm$browser$Browser$Internal = function (a) {
-	return {$: 'Internal', a: a};
+	return {$: 0, a: a};
 };
-var elm$browser$Browser$Dom$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
+var elm$browser$Browser$Dom$NotFound = elm$core$Basics$identity;
 var elm$core$String$dropLeft = F2(
 	function (n, string) {
 		return (n < 1) ? string : A3(
@@ -7698,8 +7680,8 @@ var elm$core$String$dropLeft = F2(
 			string);
 	});
 var elm$core$String$startsWith = _String_startsWith;
-var elm$url$Url$Http = {$: 'Http'};
-var elm$url$Url$Https = {$: 'Https'};
+var elm$url$Url$Http = 0;
+var elm$url$Url$Https = 1;
 var elm$core$String$indexes = _String_indexes;
 var elm$core$String$left = F2(
 	function (n, string) {
@@ -7708,7 +7690,7 @@ var elm$core$String$left = F2(
 var elm$core$String$contains = _String_contains;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
+		return {an: fragment, ap: host, aw: path, ay: port_, aC: protocol, aD: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -7724,7 +7706,7 @@ var elm$url$Url$chompBeforePath = F5(
 					var i = _n0.a;
 					var _n1 = elm$core$String$toInt(
 						A2(elm$core$String$dropLeft, i + 1, str));
-					if (_n1.$ === 'Nothing') {
+					if (_n1.$ === 1) {
 						return elm$core$Maybe$Nothing;
 					} else {
 						var port_ = _n1;
@@ -7806,14 +7788,14 @@ var elm$url$Url$chompAfterProtocol = F2(
 var elm$url$Url$fromString = function (str) {
 	return A2(elm$core$String$startsWith, 'http://', str) ? A2(
 		elm$url$Url$chompAfterProtocol,
-		elm$url$Url$Http,
+		0,
 		A2(elm$core$String$dropLeft, 7, str)) : (A2(elm$core$String$startsWith, 'https://', str) ? A2(
 		elm$url$Url$chompAfterProtocol,
-		elm$url$Url$Https,
+		1,
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$element = _Browser_element;
 var elm$json$Json$Decode$value = _Json_decodeValue;
 var author$project$Main$main = elm$browser$Browser$element(
-	{init: author$project$Main$init, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
+	{aZ: author$project$Main$init, a4: author$project$Main$subscriptions, a6: author$project$Main$update, a8: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(elm$json$Json$Decode$value)(0)}});}(this));
