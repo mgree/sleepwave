@@ -1,6 +1,9 @@
-{- TODO
+port module Main exposing (..)
 
-   store settings in localStorage (needs a port)
+{- TODO
+   nice icons
+
+   wave moving across the screen
 -}
 
 import Browser
@@ -10,11 +13,17 @@ import Html.Events exposing (onClick, onInput, onCheck, onBlur, keyCode, targetV
 import Html.Lazy
 import Task
 import Time
-import Json.Decode as Json
+
 import File.Download
+
+import Json.Encode
+import Json.Decode exposing (field)
 
 import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 
+-- PORTS
+
+port saveSettings : Json.Encode.Value -> Cmd msg
 
 -- MAIN
 
@@ -36,13 +45,7 @@ timeDifference timeNow timeThen =
     in 1000 * abs (nowFloored - thenFloored)
 
 -- MODEL
-
-defaultWaveTime : Int
-defaultWaveTime = 1000 * 60 * 5 -- 5min wave time
-
-defaultGraceTime : Int
-defaultGraceTime =  1000 * 30 -- 30sec grace period
-                      
+                     
 type State = Loading
            | Quiescent
            | BetweenWaves
@@ -88,9 +91,24 @@ countWaves model = List.filter isWaved model.log |> List.length
                 
 type alias Log = List (Time.Posix, LogEntry)
 
+-- the persistent parts, a subtype of Config
+type alias Settings =
+  { waveTime : Int -- millis
+  , graceTime : Int -- millis
+  , twelveHour : Bool
+  , remainingMode : RemainingMode
+  }
+
+defaultSettings =
+    { waveTime = 1000 * 60 * 5 -- 5min wave time
+    , graceTime = 1000 * 30 -- 30sec grace period
+    , twelveHour = True
+    , remainingMode = ClockAndTimeLeft
+    }
+    
 type alias Config =
-  { zone : Time.Zone
-  , waveTime : Int    -- millis
+  { zone : Time.Zone -- dynamically loaded every time
+  , waveTime : Int -- millis
   , graceTime : Int -- millis
   , twelveHour : Bool
   , remainingMode : RemainingMode
@@ -99,6 +117,16 @@ type alias Config =
   , enteredWaveTime : String
   , enteredGraceTime : String
   }
+
+saveConfig : Config -> Cmd msg
+saveConfig config =
+    settingsEncoder
+        { waveTime = config.waveTime
+        , graceTime = config.graceTime
+        , twelveHour = config.twelveHour
+        , remainingMode = config.remainingMode
+        } 
+        |> saveSettings
 
 setZone : Time.Zone -> Config -> Config
 setZone newZone config = { config | zone = newZone }
@@ -112,26 +140,49 @@ updateWaveTime entered config = { config | enteredWaveTime = entered }
 updateGraceTime : String -> Config -> Config
 updateGraceTime entered config = { config | enteredGraceTime = entered }
 
-trySetWaveTime : Config -> Config
-trySetWaveTime config =
-    case tryHMSToMillis config.enteredWaveTime of
-        Nothing -> config
-        Just new -> { config |
-                          waveTime = new,
-                          enteredWaveTime = millisToHMSShort new }
-
-trySetGraceTime : Config -> Config
-trySetGraceTime config =
-    case tryHMSToMillis config.enteredGraceTime of
-        Nothing -> config
-        Just new -> { config |
-                          graceTime = new,
-                          enteredGraceTime = millisToHMSShort new }
-
 cycleRemainingMode : Config -> Config
 cycleRemainingMode config =
     { config | remainingMode = nextRemainingMode config.remainingMode }
-                    
+
+settingsDecoder : Json.Decode.Decoder Settings
+settingsDecoder =
+    Json.Decode.map4
+        (\waveTime graceTime twelveHour remainingMode ->
+             { waveTime = waveTime
+             , graceTime = graceTime
+             , twelveHour = twelveHour
+             , remainingMode = remainingMode
+             })
+        (field "waveTime" Json.Decode.int)
+        (field "graceTime" Json.Decode.int)
+        (field "twelveHour" Json.Decode.bool)
+        (field "remainingMode" remainingModeDecoder)
+
+settingsEncoder : Settings -> Json.Encode.Value
+settingsEncoder settings =
+    Json.Encode.object
+        [ ("waveTime", Json.Encode.int settings.waveTime)
+        , ("graceTime", Json.Encode.int settings.graceTime)
+        , ("twelveHour", Json.Encode.bool settings.twelveHour)
+        , ("remainingMode", remainingModeEncoder settings.remainingMode)
+        ]
+            
+remainingModeDecoder : Json.Decode.Decoder RemainingMode
+remainingModeDecoder =
+    Json.Decode.string |> Json.Decode.andThen
+        (\s -> case s of
+                   "ClockAndTimeLeft" -> Json.Decode.succeed ClockAndTimeLeft
+                   "ClockOnly"        -> Json.Decode.succeed ClockOnly
+                   "TimeLeftOnly"     -> Json.Decode.succeed TimeLeftOnly
+                   _ -> Json.Decode.fail "bad remaining mode")
+
+remainingModeEncoder : RemainingMode -> Json.Encode.Value
+remainingModeEncoder mode =
+    case mode of
+        ClockAndTimeLeft -> Json.Encode.string "ClockAndTimeLeft"
+        ClockOnly        -> Json.Encode.string "ClockOnly"
+        TimeLeftOnly     -> Json.Encode.string "TimeLeftOnly"
+            
 type alias Model = 
   { state : State
   , time : Time.Posix
@@ -155,26 +206,30 @@ squashCryingStopped model =
 hasBegun : Model -> Bool
 hasBegun model = model.timeBegun /= Time.millisToPosix 0
 
-initConfig : Config
-initConfig =
+initConfig : Settings -> Config
+initConfig settings =
     { zone = Time.utc
-    , waveTime = defaultWaveTime 
-    , graceTime = defaultGraceTime
-    , twelveHour = True
-    , remainingMode = ClockAndTimeLeft
-    , enteredWaveTime = millisToHMSShort defaultWaveTime
-    , enteredGraceTime = millisToHMSShort defaultGraceTime
+    , waveTime = settings.waveTime
+    , graceTime = settings.graceTime
+    , twelveHour = settings.twelveHour
+    , remainingMode = settings.remainingMode
+    , enteredWaveTime = millisToHMSShort settings.waveTime
+    , enteredGraceTime = millisToHMSShort settings.graceTime
     }
-                 
-init : () -> (Model, Cmd Msg)
-init _ =
+    
+init : Json.Encode.Value -> (Model, Cmd Msg)
+init localStorageSettings =
   ( { state = Loading
     , time = Time.millisToPosix 0
     , timeBegun = Time.millisToPosix 0
     , priorMillis = 0
     , timeEntered = Time.millisToPosix 0
     , log = []
-    , config = initConfig
+    , config =
+        initConfig
+        (case Json.Decode.decodeValue settingsDecoder localStorageSettings of
+             Err _ -> defaultSettings
+             Ok settings -> settings)
     }
   , Task.perform (\x -> x) (Task.map2 InitializeTime Time.here Time.now)
   )
@@ -224,6 +279,10 @@ checkTimers model =
                  }
                 , Cmd.none)
             else (model, Cmd.none)
+
+updateAndSaveConfig : Config -> Model -> (Model, Cmd Msg)
+updateAndSaveConfig newConfig model =       
+    ( { model | config = newConfig }, saveConfig newConfig)
             
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -280,11 +339,7 @@ update msg model =
       , let now = clockTime model.config model.time in
         let filename = "sleep-" ++ now ++ ".csv" in
         File.Download.string filename "text/csv" (logToCSV model.config model.log))
-        
-    ConfigSetTwelveHour newTwelveHour ->
-      ( { model | config = setTwelveHour newTwelveHour model.config }
-      , Cmd.none)
-        
+       
     ConfigUpdateWaveTime newWaveTime ->
       ( { model | config = updateWaveTime newWaveTime model.config }
       , Cmd.none)
@@ -292,18 +347,34 @@ update msg model =
     ConfigUpdateGraceTime newGraceTime ->
       ( { model | config = updateGraceTime newGraceTime model.config }
       , Cmd.none)
-        
+       
     ConfigSetWaveTime ->
-      ( { model | config = trySetWaveTime model.config }
-      , Cmd.none)
+        let config = model.config in
+        case tryHMSToMillis config.enteredWaveTime of
+            Nothing -> (model, Cmd.none)
+            Just new -> 
+                updateAndSaveConfig 
+                  { config |
+                        waveTime = new,
+                        enteredWaveTime = millisToHMSShort new }
+                  model
 
     ConfigSetGraceTime ->
-      ( { model | config = trySetGraceTime model.config }
-      , Cmd.none)
+        let config = model.config in
+        case tryHMSToMillis config.enteredGraceTime of
+            Nothing -> (model, Cmd.none)
+            Just new -> 
+                updateAndSaveConfig 
+                  { config |
+                        graceTime = new,
+                        enteredGraceTime = millisToHMSShort new }
+                  model
+
+    ConfigSetTwelveHour newTwelveHour ->
+      updateAndSaveConfig (setTwelveHour newTwelveHour model.config) model
 
     ConfigCycleRemaining ->
-      ( { model | config = cycleRemainingMode model.config }
-      , Cmd.none)
+      updateAndSaveConfig (cycleRemainingMode model.config) model
 
 -- SUBSCRIPTIONS
 
@@ -556,10 +627,12 @@ timeInput config entered actual inputId labelText updateMsg setMsg =
         
 onEnter : msg -> Attribute msg
 onEnter msg =
-  let isEnter code = if code == 13 then Json.succeed "" else Json.fail ""
-      decodeEnter = Json.andThen isEnter keyCode
+  let isEnter code = if code == 13
+                     then Json.Decode.succeed ""
+                     else Json.Decode.fail ""
+      decodeEnter = Json.Decode.andThen isEnter keyCode
   in
-      on "keypress" (Json.map (\key -> msg) decodeEnter)
+      on "keypress" (Json.Decode.map (\key -> msg) decodeEnter)
         
 clockTime : Config -> Time.Posix -> String
 clockTime config time = 
