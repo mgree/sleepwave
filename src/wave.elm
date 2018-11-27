@@ -1,8 +1,20 @@
 port module Main exposing (..)
 
 {- TODO
+   clarify "total time"
+   copy to clipboard
+   date in download
+   clarify state semantics
+
+   rejigger UI to take up full screen width---currently too small on mobile
+     invert sizes of targetTime clock and time left
+
    nice icons
 
+   Travis CI
+
+   change background or add blinking when it's wave time
+     Navigator.vibrate() seems like a no-go :(
    wave moving across the screen
 -}
 
