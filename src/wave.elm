@@ -402,8 +402,8 @@ view : Model -> Html Msg
 view model =
   div [ class "container" ]
     [ row "clock" <| viewClock model
-    , row "remaining" <| viewRemaining model
     , row "actions"  <| viewActions model
+    , row "remaining" <| viewRemaining model
     , row "info" <| viewInfo model
     , Html.Lazy.lazy2 viewLog model.config model.log
     , Html.Lazy.lazy (viewConfig >> row "config") model.config
@@ -451,9 +451,10 @@ viewRemaining model =
 
 remainingTime : Model -> TimeLeft -> Html Msg
 remainingTime model computed =
-    let clock = targetTimeClock model.config computed
-        lbl   = span [] [ text "next wave" ]
+    let lbl   = span [] [ text "next wave" ]
         left  = timeLeft computed ""
+        clock = targetTimeClock model.config computed
+
     in
         div [ class "remaining"
             , onClick ConfigCycleRemaining
@@ -463,14 +464,14 @@ remainingTime model computed =
                         [ text "be ready for a visit" ]
                   ]
              else case model.config.remainingMode of
-                      ClockAndTimeLeft -> [ lbl, clock, left ]
-                      ClockOnly        -> [ lbl, clock ]
-                      TimeLeftOnly     -> [ lbl,        left ]
+                      ClockAndTimeLeft -> [ lbl, left, clock ]
+                      ClockOnly        -> [ lbl,       clock ]
+                      TimeLeftOnly     -> [ lbl, left ]
             )
 
 timeLeft : TimeLeft -> String -> Html msg
 timeLeft { remaining, targetTime } msg =
-    h4 [class "timeleft"]
+    h1 [class "timeleft"]
         [ text ("" ++ millisToHMSShort remaining ++ " " ++ msg)
         ]
         
@@ -730,7 +731,7 @@ rowLabel : String -> Html msg
 rowLabel lbl = h5 [ class "one column"] [ text lbl ]
               
 centered : Attribute msg
-centered = class "six columns offset-by-three"
+centered = class "ten columns offset-by-one"
 
 -- H:M:S parser             
 
