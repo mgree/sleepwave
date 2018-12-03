@@ -6839,7 +6839,7 @@ var author$project$Main$ResumeWave = function (a) {
 };
 var author$project$Main$StartWave = {$: 4};
 var author$project$Main$Wave = {$: 7};
-var author$project$Main$centered = elm$html$Html$Attributes$class('six columns offset-by-three');
+var author$project$Main$centered = elm$html$Html$Attributes$class('ten columns offset-by-one');
 var elm$html$Html$button = _VirtualDom_node('button');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
@@ -7479,13 +7479,12 @@ var author$project$Main$targetTimeClock = F2(
 					A2(author$project$Main$clockTime, config, targetTime))
 				]));
 	});
-var elm$html$Html$h4 = _VirtualDom_node('h4');
 var author$project$Main$timeLeft = F2(
 	function (_n0, msg) {
 		var remaining = _n0.X;
 		var targetTime = _n0.T;
 		return A2(
-			elm$html$Html$h4,
+			elm$html$Html$h1,
 			_List_fromArray(
 				[
 					elm$html$Html$Attributes$class('timeleft')
@@ -7541,7 +7540,7 @@ var author$project$Main$remainingTime = F2(
 					switch (_n0) {
 						case 0:
 							return _List_fromArray(
-								[lbl, clock, left]);
+								[lbl, left, clock]);
 						case 1:
 							return _List_fromArray(
 								[lbl, clock]);
@@ -7644,12 +7643,12 @@ var author$project$Main$view = function (model) {
 				author$project$Main$viewClock(model)),
 				A2(
 				author$project$Main$row,
-				'remaining',
-				author$project$Main$viewRemaining(model)),
-				A2(
-				author$project$Main$row,
 				'actions',
 				author$project$Main$viewActions(model)),
+				A2(
+				author$project$Main$row,
+				'remaining',
+				author$project$Main$viewRemaining(model)),
 				A2(
 				author$project$Main$row,
 				'info',
