@@ -1,15 +1,7 @@
 port module Main exposing (..)
 
 {- TODO
-   clarify "total time"
-   copy to clipboard
-   date in download
-   clarify state semantics
-
-   rejigger UI to take up full screen width---currently too small on mobile
-     invert sizes of targetTime clock and time left
-
-   nice icons
+   clarify state semantics---docs at the bottom?
 
    Travis CI
 
@@ -36,6 +28,7 @@ import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 -- PORTS
 
 port saveSettings : Json.Encode.Value -> Cmd msg
+port copyToClipboard : String -> Cmd msg
 
 -- MAIN
 
@@ -259,6 +252,7 @@ type Msg
   | EndWave
   | ResumeWave Time.Posix
   | Wave
+  | CopyLog
   | DownloadLog
   | ConfigUpdateWaveTime String
   | ConfigUpdateGraceTime String
@@ -346,10 +340,15 @@ update msg model =
                       timeEntered = model.time }
       , Cmd.none)
 
+    CopyLog ->
+      ( model
+      , copyToClipboard logBodyID)
+
     DownloadLog ->
       ( model
-      , let now = clockTime model.config model.time in
-        let filename = "sleep-" ++ now ++ ".csv" in
+      , let dateNow = date model.config model.time in
+        let timeNow = clockTime model.config model.time in
+        let filename = "sleep-" ++ dateNow ++ "-" ++ timeNow ++ ".csv" in
         File.Download.string filename "text/csv" (logToCSV model.config model.log))
        
     ConfigUpdateWaveTime newWaveTime ->
@@ -404,7 +403,7 @@ view model =
     [ row "clock" <| viewClock model
     , row "actions"  <| viewActions model
     , row "remaining" <| viewRemaining model
-    , row "info" <| viewInfo model
+    , viewInfo model
     , Html.Lazy.lazy2 viewLog model.config model.log
     , Html.Lazy.lazy (viewConfig >> row "config") model.config
     ]
@@ -422,13 +421,10 @@ viewRemaining model =
              Loading -> []
              Quiescent -> []
              BetweenWaves ->
-                 let computed =
-                         computeTimeLeft model model.timeEntered
-                             model.config.waveTime
+                 let computed = computeTimeLeft model model.timeEntered
+                                  model.config.waveTime
                  in
-                 [ div [ class "next-wave" ]
-                       [ remainingTime model computed ]
-                 ]
+                 [ remainingTime model computed ]
              Waving ->
                  [ h1 [ class "wave" ]
                       [ text "time for a visit" ]
@@ -451,12 +447,13 @@ viewRemaining model =
 
 remainingTime : Model -> TimeLeft -> Html Msg
 remainingTime model computed =
-    let lbl   = span [] [ text "next wave" ]
+    let lbl   = span [] [ icon "far fa-hand-paper"
+                        , text " next wave" ]
         left  = timeLeft computed ""
         clock = targetTimeClock model.config computed
 
     in
-        div [ class "remaining"
+        div [ class "next-wave"
             , onClick ConfigCycleRemaining
             ]
             (if waveDue model computed
@@ -494,31 +491,42 @@ viewActions model =
     let actionClass handler = [ centered, handler ] in
     case model.state of
         Loading ->
-            button (actionClass (onClick Begin)) [ text "begin" ]
+            button (actionClass (onClick Begin)) 
+                [ icon "far fa-play-circle"
+                , text " begin" ]
              
         Quiescent ->
             div []
-                [ button (actionClass (onClick StartWave)) [ text "crying started" ]
-                , button (actionClass (onClick End)) [ text "end" ]
+                [ button (actionClass (onClick StartWave)) 
+                      [ icon "far fa-tired"
+                      , text " crying started" ]
+                , button (actionClass (onClick End)) 
+                    [ icon "far fa-stop-circle"
+                    , text " end" ]
                 ]
         
         BetweenWaves ->
-            button (actionClass (onClick EndWave)) [ text "crying stopped" ]
+            button (actionClass (onClick EndWave)) 
+                [ icon "far fa-smile-beam"
+                , text " crying stopped" ]
         
         Waving ->
-            button (actionClass (onClick Wave)) [ text "i waved" ]
+            button (actionClass (onClick Wave)) 
+                [ icon "far fa-hand-paper"
+                , text " i waved" ]
 
         GracePeriod originalTimeEntered ->
             button (actionClass (onClick (ResumeWave originalTimeEntered)))
-                [ text "crying restarted" ]
+                [ icon "far fa-tired"
+                , text " crying restarted" ]
                     
 viewInfo : Model -> Html msg
 viewInfo model =
-    div [ ]
+    rowCts "info"
         (if hasBegun model
          then [ rowLabel "Information"
-              , div [ class "duration two columns offset-by-two" ]
-                    [ text "Total time: "
+              , div [ class "duration four columns offset-by-two" ]
+                    [ text "Total time monitoring: "
                     , text (millisToHMSLong
                                 (timeDifference model.time model.timeBegun +
                                  model.priorMillis))
@@ -529,10 +537,15 @@ viewInfo model =
 
 viewWaveCount : Int -> Html msg
 viewWaveCount numWaves =
-    div [ class "waves two columns" ]
-        [ if numWaves == 0
+    div [ class "waves three columns" ]
+        [ icon "far fa-hand-paper"
+        , text " "
+        , if numWaves == 0
           then text "0 waves"
           else text (countPlural numWaves "wave") ]
+
+logBodyID : String
+logBodyID = "log-body"
 
 viewLog : Config -> Log -> Html Msg
 viewLog config log =
@@ -547,20 +560,24 @@ viewLog config log =
                                [ td [] [ text "Time" ]
                                , td [] [ text "Event" ] ]
                          ]
-                   , tbody [] (List.map (viewLogEntry config) log)
+                   , tbody [ id logBodyID ] 
+                       (List.map (viewLogEntry config) log)
                    ]
               )
-        , row "log-download" <|
+        , rowCts "log-download" <|
             if List.isEmpty log
-            then span [] []
-            else button [ class "three columns offset-by-eight"
-                        , onClick DownloadLog
-                        ]
-                    [ text "download log " ]
+            then []
+            else [ div [ class "four columns offset-by-seven" ]
+                       [ button [ onClick CopyLog ]
+                           [ icon "far fa-copy"
+                           , text " copy log to clipboard" ]
+                       , button [ onClick DownloadLog ]
+                           [ icon "fas fa-download"
+                           , text " download log" ]
+                       ]
+                 ]
         ]
-            
-
-            
+                        
 viewLogEntry : Config -> (Time.Posix, LogEntry) -> Html msg
 viewLogEntry config (time, entry) =
     tr [ class "entry" ]
@@ -661,6 +678,30 @@ clockTime config time =
   in
   hour ++ ":" ++ minute ++ ":" ++ second ++ ampm
 
+date : Config -> Time.Posix -> String
+date config time =
+    let year  = Time.toYear config.zone time |> String.fromInt
+        month = Time.toMonth config.zone time |> toTwoDigitMonth
+        day   = Time.toDay config.zone time |> twoDigitInt
+    in
+    year ++ "-" ++ month ++ "-" ++ day
+
+toTwoDigitMonth : Time.Month -> String
+toTwoDigitMonth month =
+    case month of
+        Time.Jan -> "01"
+        Time.Feb -> "02"
+        Time.Mar -> "03"
+        Time.Apr -> "04"
+        Time.May -> "05"
+        Time.Jun -> "06"
+        Time.Jul -> "07"
+        Time.Aug -> "08"
+        Time.Sep -> "09"
+        Time.Oct -> "10"
+        Time.Nov -> "11"
+        Time.Dec -> "12"
+
 formatHour : Config -> Int -> String
 formatHour config baseHour =
     let hourNum = if config.twelveHour
@@ -724,14 +765,22 @@ countPlural n thing =
 
 -- skeleton wrapper
 
+rowCts : String -> List (Html msg) -> Html msg
+rowCts cls cts = div [ class "row", class cls ] cts
+
 row : String -> Html msg -> Html msg
-row cls cts = div [ class "row", class cls ] [ cts ]
+row cls cts = rowCts cls [ cts ]
 
 rowLabel : String -> Html msg
 rowLabel lbl = h5 [ class "one column"] [ text lbl ]
               
 centered : Attribute msg
 centered = class "ten columns offset-by-one"
+
+-- fontawesome wrapper
+
+icon : String -> Html msg
+icon iClass = node "i" [ class iClass ] []
 
 -- H:M:S parser             
 
