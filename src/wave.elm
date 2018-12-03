@@ -3,8 +3,6 @@ port module Main exposing (..)
 {- TODO
    clarify state semantics---docs at the bottom?
 
-   Travis CI
-
    change background or add blinking when it's wave time
      Navigator.vibrate() seems like a no-go :(
    wave moving across the screen
