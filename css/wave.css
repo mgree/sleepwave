@@ -46,6 +46,10 @@ div.row.actions button {
 
 }
 
+div.row.log-download button {
+    width: 100%;
+}
+
 .boxed {
     background-color: #eee;
     border-radius: 3rem;
