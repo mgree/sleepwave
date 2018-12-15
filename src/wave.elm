@@ -3,8 +3,10 @@ port module Main exposing (..)
 {- TODO
    clarify state semantics---docs at the bottom?
 
-   change background or add blinking when it's wave time
-     Navigator.vibrate() seems like a no-go :(
+   'delay wave' with grace time?
+
+   use browser notifications
+     https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API
    wave moving across the screen
 -}
 
