@@ -29,6 +29,7 @@ import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 
 port saveSettings : Json.Encode.Value -> Cmd msg
 port copyToClipboard : String -> Cmd msg
+port notify : String -> Cmd msg
 
 -- MAIN
 
@@ -101,6 +102,7 @@ type alias Settings =
   { waveTime : Int -- millis
   , graceTime : Int -- millis
   , twelveHour : Bool
+  , notifyOnWave : Bool
   , remainingMode : RemainingMode
   }
 
@@ -108,6 +110,7 @@ defaultSettings =
     { waveTime = 1000 * 60 * 5 -- 5min wave time
     , graceTime = 1000 * 30 -- 30sec grace period
     , twelveHour = True
+    , notifyOnWave = True
     , remainingMode = ClockAndTimeLeft
     }
     
@@ -116,6 +119,7 @@ type alias Config =
   , waveTime : Int -- millis
   , graceTime : Int -- millis
   , twelveHour : Bool
+  , notifyOnWave : Bool
   , remainingMode : RemainingMode
 
   -- for updates
@@ -129,6 +133,7 @@ saveConfig config =
         { waveTime = config.waveTime
         , graceTime = config.graceTime
         , twelveHour = config.twelveHour
+        , notifyOnWave = config.notifyOnWave
         , remainingMode = config.remainingMode
         } 
         |> saveSettings
@@ -138,7 +143,10 @@ setZone newZone config = { config | zone = newZone }
 
 setTwelveHour : Bool -> Config -> Config
 setTwelveHour newTwelveHour config = { config | twelveHour = newTwelveHour }
-                                     
+                             
+setNotifyOnWave : Bool -> Config -> Config
+setNotifyOnWave newNotifyOnWave config = { config | notifyOnWave = newNotifyOnWave }
+        
 updateWaveTime : String -> Config -> Config
 updateWaveTime entered config = { config | enteredWaveTime = entered }
                              
@@ -151,16 +159,18 @@ cycleRemainingMode config =
 
 settingsDecoder : Json.Decode.Decoder Settings
 settingsDecoder =
-    Json.Decode.map4
-        (\waveTime graceTime twelveHour remainingMode ->
+    Json.Decode.map5
+        (\waveTime graceTime twelveHour notifyOnWave remainingMode ->
              { waveTime = waveTime
              , graceTime = graceTime
              , twelveHour = twelveHour
+             , notifyOnWave = notifyOnWave
              , remainingMode = remainingMode
              })
         (field "waveTime" Json.Decode.int)
         (field "graceTime" Json.Decode.int)
         (field "twelveHour" Json.Decode.bool)
+        (field "notifyOnWave" Json.Decode.bool)
         (field "remainingMode" remainingModeDecoder)
 
 settingsEncoder : Settings -> Json.Encode.Value
@@ -169,6 +179,7 @@ settingsEncoder settings =
         [ ("waveTime", Json.Encode.int settings.waveTime)
         , ("graceTime", Json.Encode.int settings.graceTime)
         , ("twelveHour", Json.Encode.bool settings.twelveHour)
+        , ("notifyOnWave", Json.Encode.bool settings.notifyOnWave)
         , ("remainingMode", remainingModeEncoder settings.remainingMode)
         ]
             
@@ -217,6 +228,7 @@ initConfig settings =
     , waveTime = settings.waveTime
     , graceTime = settings.graceTime
     , twelveHour = settings.twelveHour
+    , notifyOnWave = settings.notifyOnWave
     , remainingMode = settings.remainingMode
     , enteredWaveTime = millisToHMSShort settings.waveTime
     , enteredGraceTime = millisToHMSShort settings.graceTime
@@ -242,7 +254,6 @@ init localStorageSettings =
 
 -- UPDATE
 
-
 type Msg
   = Tick Time.Posix
   | InitializeTime Time.Zone Time.Posix
@@ -259,6 +270,7 @@ type Msg
   | ConfigSetWaveTime
   | ConfigSetGraceTime
   | ConfigSetTwelveHour Bool
+  | ConfigSetNotifyOnWave Bool
   | ConfigCycleRemaining
 
 checkTimers : Model -> (Model, Cmd Msg)
@@ -274,7 +286,9 @@ checkTimers model =
             then -- time for a wave
                 ({ model | state = Waving,
                            timeEntered = model.time }
-                , Cmd.none)
+                , if model.config.notifyOnWave
+                  then notify (clockTime model.config model.timeEntered ++ " -- Time for a visit!")
+                  else Cmd.none)
             else (model, Cmd.none)
                 
         GracePeriod originalTime ->  
@@ -383,6 +397,9 @@ update msg model =
 
     ConfigSetTwelveHour newTwelveHour ->
       updateAndSaveConfig (setTwelveHour newTwelveHour model.config) model
+
+    ConfigSetNotifyOnWave newNotifyOnWave ->
+      updateAndSaveConfig (setNotifyOnWave newNotifyOnWave model.config) model
 
     ConfigCycleRemaining ->
       updateAndSaveConfig (cycleRemainingMode model.config) model
@@ -632,6 +649,16 @@ viewConfig config =
                   , label [ for "config-twelve-hour24" ]
                       [ text "24-hour clock" ]
                   ]
+            ]
+        , div [ class "three columns" ]
+            [ input [ id "config-notify-on-wave" 
+                    , type_ "checkbox"
+                    , checked config.notifyOnWave
+                    , onCheck ConfigSetNotifyOnWave
+                    ]
+                  []
+            , label [ for "config-notify-on-wave" ]
+                [ text "Notify when it's time for a visit" ]
             ]
         ]
 
