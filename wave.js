@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ac.P === region.aj.P)
+	if (region.ad.Q === region.ak.Q)
 	{
-		return 'on line ' + region.ac.P;
+		return 'on line ' + region.ad.Q;
 	}
-	return 'on lines ' + region.ac.P + ' through ' + region.aj.P;
+	return 'on lines ' + region.ad.Q + ' through ' + region.ak.Q;
 }
 
 
@@ -1894,9 +1894,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aZ,
-		impl.a6,
-		impl.a4,
+		impl.a_,
+		impl.a7,
+		impl.a5,
 		function() { return function() {} }
 	);
 });
@@ -3017,9 +3017,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		x: func(record.x),
-		ad: record.ad,
-		ab: record.ab
+		y: func(record.y),
+		ae: record.ae,
+		ac: record.ac
 	}
 });
 
@@ -3287,11 +3287,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.x;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ad;
+		var message = !tag ? value : tag < 3 ? value.a : value.y;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ae;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ab) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ac) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -4241,11 +4241,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aZ,
-		impl.a6,
-		impl.a4,
+		impl.a_,
+		impl.a7,
+		impl.a5,
 		function(sendToApp, initialModel) {
-			var view = impl.a8;
+			var view = impl.a9;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -4277,12 +4277,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aZ,
-		impl.a6,
-		impl.a4,
+		impl.a_,
+		impl.a7,
+		impl.a5,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
-			var view = impl.a8;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.a9;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4290,12 +4290,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aR);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aS);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.a5) && (_VirtualDom_doc.title = title = doc.a5);
+				(title !== doc.a6) && (_VirtualDom_doc.title = title = doc.a6);
 			});
 		}
 	);
@@ -4351,12 +4351,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.a0;
-	var onUrlRequest = impl.a1;
+	var onUrlChange = impl.a1;
+	var onUrlRequest = impl.a2;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4372,9 +4372,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aC === next.aC
-							&& curr.ap === next.ap
-							&& curr.ay.a === next.ay.a
+							&& curr.aD === next.aD
+							&& curr.aq === next.aq
+							&& curr.az.a === next.az.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4382,13 +4382,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aZ: function(flags)
+		a_: function(flags)
 		{
-			return A3(impl.aZ, flags, _Browser_getUrl(), key);
+			return A3(impl.a_, flags, _Browser_getUrl(), key);
 		},
-		a8: impl.a8,
-		a6: impl.a6,
-		a4: impl.a4
+		a9: impl.a9,
+		a7: impl.a7,
+		a5: impl.a5
 	});
 }
 
@@ -4454,17 +4454,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aX: 'hidden', aS: 'visibilitychange' }
+		? { aY: 'hidden', aT: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aX: 'mozHidden', aS: 'mozvisibilitychange' }
+		? { aY: 'mozHidden', aT: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aX: 'msHidden', aS: 'msvisibilitychange' }
+		? { aY: 'msHidden', aT: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aX: 'webkitHidden', aS: 'webkitvisibilitychange' }
-		: { aX: 'hidden', aS: 'visibilitychange' };
+		? { aY: 'webkitHidden', aT: 'webkitvisibilitychange' }
+		: { aY: 'hidden', aT: 'visibilitychange' };
 }
 
 
@@ -4545,12 +4545,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aI: _Browser_getScene(),
-		aO: {
-			Y: _Browser_window.pageXOffset,
-			Z: _Browser_window.pageYOffset,
-			N: _Browser_doc.documentElement.clientWidth,
-			I: _Browser_doc.documentElement.clientHeight
+		aJ: _Browser_getScene(),
+		aP: {
+			Z: _Browser_window.pageXOffset,
+			_: _Browser_window.pageYOffset,
+			O: _Browser_doc.documentElement.clientWidth,
+			J: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4560,8 +4560,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		N: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		I: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		O: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		J: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4584,15 +4584,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aI: {
-				N: node.scrollWidth,
-				I: node.scrollHeight
+			aJ: {
+				O: node.scrollWidth,
+				J: node.scrollHeight
 			},
-			aO: {
-				Y: node.scrollLeft,
-				Z: node.scrollTop,
-				N: node.clientWidth,
-				I: node.clientHeight
+			aP: {
+				Z: node.scrollLeft,
+				_: node.scrollTop,
+				O: node.clientWidth,
+				J: node.clientHeight
 			}
 		};
 	});
@@ -4622,18 +4622,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aI: _Browser_getScene(),
-			aO: {
-				Y: x,
-				Z: y,
-				N: _Browser_doc.documentElement.clientWidth,
-				I: _Browser_doc.documentElement.clientHeight
+			aJ: _Browser_getScene(),
+			aP: {
+				Z: x,
+				_: y,
+				O: _Browser_doc.documentElement.clientWidth,
+				J: _Browser_doc.documentElement.clientHeight
 			},
-			aU: {
-				Y: x + rect.left,
-				Z: y + rect.top,
-				N: rect.width,
-				I: rect.height
+			aV: {
+				Z: x + rect.left,
+				_: y + rect.top,
+				O: rect.width,
+				J: rect.height
 			}
 		};
 	});
@@ -4756,7 +4756,7 @@ var elm$core$Array$toList = function (array) {
 	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
 var elm$core$Basics$mul = _Basics_mul;
-var author$project$Main$defaultSettings = {l: 1000 * 30, q: 0, m: true, k: (1000 * 60) * 5};
+var author$project$Main$defaultSettings = {l: 1000 * 30, q: true, r: 0, m: true, k: (1000 * 60) * 5};
 var elm$core$Basics$idiv = _Basics_idiv;
 var elm$core$Basics$modBy = _Basics_modBy;
 var author$project$Main$millisToHMS = function (millis) {
@@ -4952,13 +4952,14 @@ var elm$time$Time$Zone = F2(
 var elm$time$Time$utc = A2(elm$time$Time$Zone, 0, _List_Nil);
 var author$project$Main$initConfig = function (settings) {
 	return {
-		G: author$project$Main$millisToHMSShort(settings.l),
-		H: author$project$Main$millisToHMSShort(settings.k),
+		H: author$project$Main$millisToHMSShort(settings.l),
+		I: author$project$Main$millisToHMSShort(settings.k),
 		l: settings.l,
 		q: settings.q,
+		r: settings.r,
 		m: settings.m,
 		k: settings.k,
-		v: elm$time$Time$utc
+		w: elm$time$Time$utc
 	};
 };
 var author$project$Main$ClockOnly = 1;
@@ -5328,16 +5329,17 @@ var author$project$Main$remainingModeDecoder = A2(
 var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$int = _Json_decodeInt;
-var elm$json$Json$Decode$map4 = _Json_map4;
-var author$project$Main$settingsDecoder = A5(
-	elm$json$Json$Decode$map4,
-	F4(
-		function (waveTime, graceTime, twelveHour, remainingMode) {
-			return {l: graceTime, q: remainingMode, m: twelveHour, k: waveTime};
+var elm$json$Json$Decode$map5 = _Json_map5;
+var author$project$Main$settingsDecoder = A6(
+	elm$json$Json$Decode$map5,
+	F5(
+		function (waveTime, graceTime, twelveHour, notifyOnWave, remainingMode) {
+			return {l: graceTime, q: notifyOnWave, r: remainingMode, m: twelveHour, k: waveTime};
 		}),
 	A2(elm$json$Json$Decode$field, 'waveTime', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'graceTime', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'twelveHour', elm$json$Json$Decode$bool),
+	A2(elm$json$Json$Decode$field, 'notifyOnWave', elm$json$Json$Decode$bool),
 	A2(elm$json$Json$Decode$field, 'remainingMode', author$project$Main$remainingModeDecoder));
 var elm$core$Task$andThen = _Scheduler_andThen;
 var elm$core$Task$succeed = _Scheduler_succeed;
@@ -5456,11 +5458,11 @@ var author$project$Main$init = function (localStorageSettings) {
 						return settings;
 					}
 				}()),
-			s: _List_Nil,
-			Q: 0,
+			t: _List_Nil,
+			R: 0,
 			o: author$project$Main$Loading,
 			f: elm$time$Time$millisToPosix(0),
-			D: elm$time$Time$millisToPosix(0),
+			E: elm$time$Time$millisToPosix(0),
 			j: elm$time$Time$millisToPosix(0)
 		},
 		A2(
@@ -5481,7 +5483,7 @@ var elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {aB: processes, aM: taggers};
+		return {aC: processes, aN: taggers};
 	});
 var elm$time$Time$init = elm$core$Task$succeed(
 	A2(elm$time$Time$State, elm$core$Dict$empty, elm$core$Dict$empty));
@@ -5760,7 +5762,7 @@ var elm$time$Time$spawnHelp = F3(
 	});
 var elm$time$Time$onEffects = F3(
 	function (router, subs, _n0) {
-		var processes = _n0.aB;
+		var processes = _n0.aC;
 		var rightStep = F3(
 			function (_n6, id, _n7) {
 				var spawns = _n7.a;
@@ -5826,7 +5828,7 @@ var elm$time$Time$onEffects = F3(
 	});
 var elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _n0 = A2(elm$core$Dict$get, interval, state.aM);
+		var _n0 = A2(elm$core$Dict$get, interval, state.aN);
 		if (_n0.$ === 1) {
 			return elm$core$Task$succeed(state);
 		} else {
@@ -5883,63 +5885,21 @@ var author$project$Main$Waved = function (a) {
 	return {$: 5, a: a};
 };
 var author$project$Main$Waving = {$: 3};
-var elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
-};
-var elm$time$Time$posixToMillis = function (_n0) {
-	var millis = _n0;
-	return millis;
-};
-var author$project$Main$timeDifference = F2(
-	function (timeNow, timeThen) {
-		var thenFloored = (elm$time$Time$posixToMillis(timeThen) / 1000) | 0;
-		var nowFloored = (elm$time$Time$posixToMillis(timeNow) / 1000) | 0;
-		return 1000 * elm$core$Basics$abs(nowFloored - thenFloored);
-	});
-var elm$core$Basics$ge = _Utils_ge;
-var elm$core$Platform$Cmd$batch = _Platform_batch;
-var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Main$checkTimers = function (model) {
-	var _n0 = model.o;
-	switch (_n0.$) {
-		case 0:
-			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		case 1:
-			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		case 3:
-			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		case 2:
-			return (_Utils_cmp(
-				A2(author$project$Main$timeDifference, model.f, model.j),
-				model.d.k) > -1) ? _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{o: author$project$Main$Waving, j: model.f}),
-				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		default:
-			var originalTime = _n0.a;
-			return (_Utils_cmp(
-				A2(author$project$Main$timeDifference, model.f, model.j),
-				model.d.l) > -1) ? _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{o: author$project$Main$Quiescent, j: model.f}),
-				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-	}
-};
 var author$project$Main$formatHour = F2(
 	function (config, baseHour) {
 		var hourNum = config.m ? A2(elm$core$Basics$modBy, 12, baseHour) : baseHour;
 		var hour12 = (!hourNum) ? 12 : hourNum;
 		return elm$core$String$fromInt(hour12);
 	});
+var elm$core$Basics$ge = _Utils_ge;
 var elm$time$Time$flooredDiv = F2(
 	function (numerator, denominator) {
 		return elm$core$Basics$floor(numerator / denominator);
 	});
+var elm$time$Time$posixToMillis = function (_n0) {
+	var millis = _n0;
+	return millis;
+};
 var elm$time$Time$toAdjustedMinutesHelp = F3(
 	function (defaultOffset, posixMinutes, eras) {
 		toAdjustedMinutesHelp:
@@ -5949,7 +5909,7 @@ var elm$time$Time$toAdjustedMinutesHelp = F3(
 			} else {
 				var era = eras.a;
 				var olderEras = eras.b;
-				if (_Utils_cmp(era.ac, posixMinutes) < 0) {
+				if (_Utils_cmp(era.ad, posixMinutes) < 0) {
 					return posixMinutes + era.b;
 				} else {
 					var $temp$defaultOffset = defaultOffset,
@@ -6006,15 +5966,59 @@ var elm$time$Time$toSecond = F2(
 var author$project$Main$clockTime = F2(
 	function (config, time) {
 		var second = author$project$Main$twoDigitInt(
-			A2(elm$time$Time$toSecond, config.v, time));
+			A2(elm$time$Time$toSecond, config.w, time));
 		var minute = author$project$Main$twoDigitInt(
-			A2(elm$time$Time$toMinute, config.v, time));
-		var baseHour = A2(elm$time$Time$toHour, config.v, time);
+			A2(elm$time$Time$toMinute, config.w, time));
+		var baseHour = A2(elm$time$Time$toHour, config.w, time);
 		var hour = A2(author$project$Main$formatHour, config, baseHour);
 		var ampm = config.m ? ((baseHour >= 12) ? 'pm' : 'am') : '';
 		return hour + (':' + (minute + (':' + (second + ampm))));
 	});
 var elm$json$Json$Encode$string = _Json_wrap;
+var author$project$Main$notify = _Platform_outgoingPort('notify', elm$json$Json$Encode$string);
+var elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var author$project$Main$timeDifference = F2(
+	function (timeNow, timeThen) {
+		var thenFloored = (elm$time$Time$posixToMillis(timeThen) / 1000) | 0;
+		var nowFloored = (elm$time$Time$posixToMillis(timeNow) / 1000) | 0;
+		return 1000 * elm$core$Basics$abs(nowFloored - thenFloored);
+	});
+var elm$core$Platform$Cmd$batch = _Platform_batch;
+var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
+var author$project$Main$checkTimers = function (model) {
+	var _n0 = model.o;
+	switch (_n0.$) {
+		case 0:
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		case 1:
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		case 3:
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		case 2:
+			return (_Utils_cmp(
+				A2(author$project$Main$timeDifference, model.f, model.j),
+				model.d.k) > -1) ? _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{o: author$project$Main$Waving, j: model.f}),
+				model.d.q ? author$project$Main$notify(
+					A2(author$project$Main$clockTime, model.d, model.j) + ' -- Time for a visit!') : elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		default:
+			var originalTime = _n0.a;
+			return (_Utils_cmp(
+				A2(author$project$Main$timeDifference, model.f, model.j),
+				model.d.l) > -1) ? _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{o: author$project$Main$Quiescent, j: model.f}),
+				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+	}
+};
 var author$project$Main$copyToClipboard = _Platform_outgoingPort('copyToClipboard', elm$json$Json$Encode$string);
 var author$project$Main$nextRemainingMode = function (mode) {
 	switch (mode) {
@@ -6030,7 +6034,7 @@ var author$project$Main$cycleRemainingMode = function (config) {
 	return _Utils_update(
 		config,
 		{
-			q: author$project$Main$nextRemainingMode(config.q)
+			r: author$project$Main$nextRemainingMode(config.r)
 		});
 };
 var author$project$Main$toTwoDigitMonth = function (month) {
@@ -6071,15 +6075,15 @@ var elm$time$Time$toCivil = function (minutes) {
 	var month = mp + ((mp < 10) ? 3 : (-9));
 	var year = yearOfEra + (era * 400);
 	return {
-		ai: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
-		au: month,
-		aP: year + ((month <= 2) ? 1 : 0)
+		aj: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		av: month,
+		aQ: year + ((month <= 2) ? 1 : 0)
 	};
 };
 var elm$time$Time$toDay = F2(
 	function (zone, time) {
 		return elm$time$Time$toCivil(
-			A2(elm$time$Time$toAdjustedMinutes, zone, time)).ai;
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).aj;
 	});
 var elm$time$Time$Apr = 3;
 var elm$time$Time$Aug = 7;
@@ -6096,7 +6100,7 @@ var elm$time$Time$Sep = 8;
 var elm$time$Time$toMonth = F2(
 	function (zone, time) {
 		var _n0 = elm$time$Time$toCivil(
-			A2(elm$time$Time$toAdjustedMinutes, zone, time)).au;
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).av;
 		switch (_n0) {
 			case 1:
 				return 0;
@@ -6127,16 +6131,16 @@ var elm$time$Time$toMonth = F2(
 var elm$time$Time$toYear = F2(
 	function (zone, time) {
 		return elm$time$Time$toCivil(
-			A2(elm$time$Time$toAdjustedMinutes, zone, time)).aP;
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).aQ;
 	});
 var author$project$Main$date = F2(
 	function (config, time) {
 		var year = elm$core$String$fromInt(
-			A2(elm$time$Time$toYear, config.v, time));
+			A2(elm$time$Time$toYear, config.w, time));
 		var month = author$project$Main$toTwoDigitMonth(
-			A2(elm$time$Time$toMonth, config.v, time));
+			A2(elm$time$Time$toMonth, config.w, time));
 		var day = author$project$Main$twoDigitInt(
-			A2(elm$time$Time$toDay, config.v, time));
+			A2(elm$time$Time$toDay, config.w, time));
 		return year + ('-' + (month + ('-' + day)));
 	});
 var author$project$Main$logBodyID = 'log-body';
@@ -6145,10 +6149,10 @@ var author$project$Main$logEntry = F2(
 		return _Utils_update(
 			model,
 			{
-				s: A2(
+				t: A2(
 					elm$core$List$cons,
 					_Utils_Tuple2(model.f, entry),
-					model.s)
+					model.t)
 			});
 	});
 var author$project$Main$logEntryToString = F2(
@@ -6222,6 +6226,12 @@ var author$project$Main$logToCSV = F2(
 				author$project$Main$logRowToCSV(config),
 				log)) + '\n';
 	});
+var author$project$Main$setNotifyOnWave = F2(
+	function (newNotifyOnWave, config) {
+		return _Utils_update(
+			config,
+			{q: newNotifyOnWave});
+	});
 var author$project$Main$setTwelveHour = F2(
 	function (newTwelveHour, config) {
 		return _Utils_update(
@@ -6232,11 +6242,11 @@ var author$project$Main$setZone = F2(
 	function (newZone, config) {
 		return _Utils_update(
 			config,
-			{v: newZone});
+			{w: newZone});
 	});
 var author$project$Main$CryingSquashed = {$: 4};
 var author$project$Main$squashCryingStopped = function (model) {
-	var _n0 = model.s;
+	var _n0 = model.t;
 	if (_n0.b && (_n0.a.b.$ === 3)) {
 		var _n1 = _n0.a;
 		var time = _n1.a;
@@ -6245,7 +6255,7 @@ var author$project$Main$squashCryingStopped = function (model) {
 		return _Utils_update(
 			model,
 			{
-				s: A2(
+				t: A2(
 					elm$core$List$cons,
 					_Utils_Tuple2(time, author$project$Main$CryingSquashed),
 					oldLog)
@@ -6271,7 +6281,7 @@ var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 					elm$parser$Parser$Advanced$Good,
 					_Utils_cmp(s0.b, offset) < 0,
 					0,
-					{ah: col, c: s0.c, e: s0.e, b: offset, aH: row, a: s0.a});
+					{ai: col, c: s0.c, e: s0.e, b: offset, aI: row, a: s0.a});
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -6303,7 +6313,7 @@ var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 	});
 var elm$parser$Parser$Advanced$chompWhile = function (isGood) {
 	return function (s) {
-		return A5(elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.b, s.aH, s.ah, s);
+		return A5(elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.b, s.aI, s.ai, s);
 	};
 };
 var elm$parser$Parser$chompWhile = elm$parser$Parser$Advanced$chompWhile;
@@ -6386,7 +6396,7 @@ var elm$parser$Parser$Advanced$AddRight = F2(
 	});
 var elm$parser$Parser$Advanced$DeadEnd = F4(
 	function (row, col, problem, contextStack) {
-		return {ah: col, aT: contextStack, az: problem, aH: row};
+		return {ai: col, aU: contextStack, aA: problem, aI: row};
 	});
 var elm$parser$Parser$Advanced$Empty = {$: 0};
 var elm$parser$Parser$Advanced$fromState = F2(
@@ -6394,7 +6404,7 @@ var elm$parser$Parser$Advanced$fromState = F2(
 		return A2(
 			elm$parser$Parser$Advanced$AddRight,
 			elm$parser$Parser$Advanced$Empty,
-			A4(elm$parser$Parser$Advanced$DeadEnd, s.aH, s.ah, x, s.c));
+			A4(elm$parser$Parser$Advanced$DeadEnd, s.aI, s.ai, x, s.c));
 	});
 var elm$parser$Parser$Advanced$end = function (x) {
 	return function (s) {
@@ -6510,7 +6520,7 @@ var elm$parser$Parser$Advanced$token = function (_n0) {
 	var expecting = _n0.b;
 	var progress = !elm$core$String$isEmpty(str);
 	return function (s) {
-		var _n1 = A5(elm$parser$Parser$Advanced$isSubString, str, s.b, s.aH, s.ah, s.a);
+		var _n1 = A5(elm$parser$Parser$Advanced$isSubString, str, s.b, s.aI, s.ai, s.a);
 		var newOffset = _n1.a;
 		var newRow = _n1.b;
 		var newCol = _n1.c;
@@ -6521,7 +6531,7 @@ var elm$parser$Parser$Advanced$token = function (_n0) {
 			elm$parser$Parser$Advanced$Good,
 			progress,
 			0,
-			{ah: newCol, c: s.c, e: s.e, b: newOffset, aH: newRow, a: s.a});
+			{ai: newCol, c: s.c, e: s.e, b: newOffset, aI: newRow, a: s.a});
 	};
 };
 var elm$parser$Parser$Advanced$symbol = elm$parser$Parser$Advanced$token;
@@ -6592,10 +6602,10 @@ var author$project$Main$parseHMS = A2(
 		elm$parser$Parser$end));
 var elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
-		return {ah: col, az: problem, aH: row};
+		return {ai: col, aA: problem, aI: row};
 	});
 var elm$parser$Parser$problemToDeadEnd = function (p) {
-	return A3(elm$parser$Parser$DeadEnd, p.aH, p.ah, p.az);
+	return A3(elm$parser$Parser$DeadEnd, p.aI, p.ai, p.aA);
 };
 var elm$parser$Parser$Advanced$bagToList = F2(
 	function (bag, list) {
@@ -6627,7 +6637,7 @@ var elm$parser$Parser$Advanced$run = F2(
 	function (_n0, src) {
 		var parse = _n0;
 		var _n1 = parse(
-			{ah: 1, c: _List_Nil, e: 1, b: 0, aH: 1, a: src});
+			{ai: 1, c: _List_Nil, e: 1, b: 0, aI: 1, a: src});
 		if (!_n1.$) {
 			var value = _n1.b;
 			return elm$core$Result$Ok(value);
@@ -6701,14 +6711,17 @@ var author$project$Main$settingsEncoder = function (settings) {
 				'twelveHour',
 				elm$json$Json$Encode$bool(settings.m)),
 				_Utils_Tuple2(
+				'notifyOnWave',
+				elm$json$Json$Encode$bool(settings.q)),
+				_Utils_Tuple2(
 				'remainingMode',
-				author$project$Main$remainingModeEncoder(settings.q))
+				author$project$Main$remainingModeEncoder(settings.r))
 			]));
 };
 var author$project$Main$saveConfig = function (config) {
 	return author$project$Main$saveSettings(
 		author$project$Main$settingsEncoder(
-			{l: config.l, q: config.q, m: config.m, k: config.k}));
+			{l: config.l, q: config.q, r: config.r, m: config.m, k: config.k}));
 };
 var author$project$Main$updateAndSaveConfig = F2(
 	function (newConfig, model) {
@@ -6722,13 +6735,13 @@ var author$project$Main$updateGraceTime = F2(
 	function (entered, config) {
 		return _Utils_update(
 			config,
-			{G: entered});
+			{H: entered});
 	});
 var author$project$Main$updateWaveTime = F2(
 	function (entered, config) {
 		return _Utils_update(
 			config,
-			{H: entered});
+			{I: entered});
 	});
 var elm$core$Basics$never = function (_n0) {
 	never:
@@ -6773,7 +6786,7 @@ var author$project$Main$update = F2(
 						author$project$Main$Began,
 						_Utils_update(
 							model,
-							{o: author$project$Main$Quiescent, D: model.f, j: model.f})),
+							{o: author$project$Main$Quiescent, E: model.f, j: model.f})),
 					elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
@@ -6783,9 +6796,9 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								Q: model.Q + A2(author$project$Main$timeDifference, model.f, model.D),
+								R: model.R + A2(author$project$Main$timeDifference, model.f, model.E),
 								o: author$project$Main$Loading,
-								D: elm$time$Time$millisToPosix(0),
+								E: elm$time$Time$millisToPosix(0),
 								j: model.f
 							})),
 					elm$core$Platform$Cmd$none);
@@ -6842,7 +6855,7 @@ var author$project$Main$update = F2(
 							elm$file$File$Download$string,
 							filename,
 							'text/csv',
-							A2(author$project$Main$logToCSV, model.d, model.s));
+							A2(author$project$Main$logToCSV, model.d, model.t));
 					}());
 			case 10:
 				var newWaveTime = msg.a;
@@ -6864,7 +6877,7 @@ var author$project$Main$update = F2(
 					elm$core$Platform$Cmd$none);
 			case 12:
 				var config = model.d;
-				var _n1 = author$project$Main$tryHMSToMillis(config.H);
+				var _n1 = author$project$Main$tryHMSToMillis(config.I);
 				if (_n1.$ === 1) {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				} else {
@@ -6874,14 +6887,14 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							config,
 							{
-								H: author$project$Main$millisToHMSShort(_new),
+								I: author$project$Main$millisToHMSShort(_new),
 								k: _new
 							}),
 						model);
 				}
 			case 13:
 				var config = model.d;
-				var _n2 = author$project$Main$tryHMSToMillis(config.G);
+				var _n2 = author$project$Main$tryHMSToMillis(config.H);
 				if (_n2.$ === 1) {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				} else {
@@ -6891,7 +6904,7 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							config,
 							{
-								G: author$project$Main$millisToHMSShort(_new),
+								H: author$project$Main$millisToHMSShort(_new),
 								l: _new
 							}),
 						model);
@@ -6901,6 +6914,12 @@ var author$project$Main$update = F2(
 				return A2(
 					author$project$Main$updateAndSaveConfig,
 					A2(author$project$Main$setTwelveHour, newTwelveHour, model.d),
+					model);
+			case 15:
+				var newNotifyOnWave = msg.a;
+				return A2(
+					author$project$Main$updateAndSaveConfig,
+					A2(author$project$Main$setNotifyOnWave, newNotifyOnWave, model.d),
 					model);
 			default:
 				return A2(
@@ -7087,6 +7106,9 @@ var author$project$Main$viewClock = function (model) {
 			]));
 };
 var author$project$Main$ConfigSetGraceTime = {$: 13};
+var author$project$Main$ConfigSetNotifyOnWave = function (a) {
+	return {$: 15, a: a};
+};
 var author$project$Main$ConfigSetTwelveHour = function (a) {
 	return {$: 14, a: a};
 };
@@ -7260,7 +7282,7 @@ var author$project$Main$viewConfig = function (config) {
 					author$project$Main$timeInput,
 					config,
 					function ($) {
-						return $.H;
+						return $.I;
 					},
 					function ($) {
 						return $.k;
@@ -7279,7 +7301,7 @@ var author$project$Main$viewConfig = function (config) {
 					author$project$Main$timeInput,
 					config,
 					function ($) {
-						return $.G;
+						return $.H;
 					},
 					function ($) {
 						return $.l;
@@ -7352,6 +7374,35 @@ var author$project$Main$viewConfig = function (config) {
 										elm$html$Html$text('24-hour clock')
 									]))
 							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('three columns')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$id('config-notify-on-wave'),
+								elm$html$Html$Attributes$type_('checkbox'),
+								elm$html$Html$Attributes$checked(config.q),
+								elm$html$Html$Events$onCheck(author$project$Main$ConfigSetNotifyOnWave)
+							]),
+						_List_Nil),
+						A2(
+						elm$html$Html$label,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$for('config-notify-on-wave')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Notify when it\'s time for a visit')
+							]))
 					]))
 			]));
 };
@@ -7365,12 +7416,12 @@ var author$project$Main$isWaved = function (_n0) {
 };
 var author$project$Main$countWaves = function (model) {
 	return elm$core$List$length(
-		A2(elm$core$List$filter, author$project$Main$isWaved, model.s));
+		A2(elm$core$List$filter, author$project$Main$isWaved, model.t));
 };
 var elm$core$Basics$neq = _Utils_notEqual;
 var author$project$Main$hasBegun = function (model) {
 	return !_Utils_eq(
-		model.D,
+		model.E,
 		elm$time$Time$millisToPosix(0));
 };
 var author$project$Main$millisToHMSLong = function (millis) {
@@ -7426,7 +7477,7 @@ var author$project$Main$viewInfo = function (model) {
 						elm$html$Html$text('Total time monitoring: '),
 						elm$html$Html$text(
 						author$project$Main$millisToHMSLong(
-							A2(author$project$Main$timeDifference, model.f, model.D) + model.Q))
+							A2(author$project$Main$timeDifference, model.f, model.E) + model.R))
 					])),
 				A2(
 				elm$html$Html$Lazy$lazy,
@@ -7629,13 +7680,13 @@ var author$project$Main$computeTimeLeft = F3(
 		var remaining = duration - elapsed;
 		var targetTime = elm$time$Time$millisToPosix(
 			elm$time$Time$posixToMillis(model.f) + remaining);
-		return {X: remaining, T: targetTime};
+		return {Y: remaining, U: targetTime};
 	});
-var author$project$Main$ConfigCycleRemaining = {$: 15};
+var author$project$Main$ConfigCycleRemaining = {$: 16};
 var author$project$Main$targetTimeClock = F2(
 	function (config, _n0) {
-		var remaining = _n0.X;
-		var targetTime = _n0.T;
+		var remaining = _n0.Y;
+		var targetTime = _n0.U;
 		return A2(
 			elm$html$Html$h1,
 			_List_fromArray(
@@ -7650,8 +7701,8 @@ var author$project$Main$targetTimeClock = F2(
 	});
 var author$project$Main$timeLeft = F2(
 	function (_n0, msg) {
-		var remaining = _n0.X;
-		var targetTime = _n0.T;
+		var remaining = _n0.Y;
+		var targetTime = _n0.U;
 		return A2(
 			elm$html$Html$h1,
 			_List_fromArray(
@@ -7666,7 +7717,7 @@ var author$project$Main$timeLeft = F2(
 	});
 var author$project$Main$waveDue = F2(
 	function (model, _n0) {
-		var targetTime = _n0.T;
+		var targetTime = _n0.U;
 		return _Utils_cmp(
 			elm$time$Time$posixToMillis(model.f),
 			elm$time$Time$posixToMillis(targetTime)) > -1;
@@ -7707,7 +7758,7 @@ var author$project$Main$remainingTime = F2(
 								]))
 						]);
 				} else {
-					var _n0 = model.d.q;
+					var _n0 = model.d.r;
 					switch (_n0) {
 						case 0:
 							return _List_fromArray(
@@ -7812,7 +7863,7 @@ var author$project$Main$view = function (model) {
 				'remaining',
 				author$project$Main$viewRemaining(model)),
 				author$project$Main$viewInfo(model),
-				A3(elm$html$Html$Lazy$lazy2, author$project$Main$viewLog, model.d, model.s),
+				A3(elm$html$Html$Lazy$lazy2, author$project$Main$viewLog, model.d, model.t),
 				A2(
 				elm$html$Html$Lazy$lazy,
 				A2(
@@ -7848,7 +7899,7 @@ var elm$core$String$left = F2(
 var elm$core$String$contains = _String_contains;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {an: fragment, ap: host, aw: path, ay: port_, aC: protocol, aD: query};
+		return {ao: fragment, aq: host, ax: path, az: port_, aD: protocol, aE: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -7955,5 +8006,5 @@ var elm$url$Url$fromString = function (str) {
 var elm$browser$Browser$element = _Browser_element;
 var elm$json$Json$Decode$value = _Json_decodeValue;
 var author$project$Main$main = elm$browser$Browser$element(
-	{aZ: author$project$Main$init, a4: author$project$Main$subscriptions, a6: author$project$Main$update, a8: author$project$Main$view});
+	{a_: author$project$Main$init, a5: author$project$Main$subscriptions, a7: author$project$Main$update, a9: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(elm$json$Json$Decode$value)(0)}});}(this));
