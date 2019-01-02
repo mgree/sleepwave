@@ -30,6 +30,7 @@ import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 port saveSettings : Json.Encode.Value -> Cmd msg
 port copyToClipboard : String -> Cmd msg
 port notify : String -> Cmd msg
+port notificationPermission : (Json.Encode.Value -> msg) -> Sub msg
 
 -- MAIN
 
@@ -122,6 +123,9 @@ type alias Config =
   , notifyOnWave : Bool
   , remainingMode : RemainingMode
 
+  -- for notifications
+  , notificationsPermitted : Bool
+
   -- for updates
   , enteredWaveTime : String
   , enteredGraceTime : String
@@ -152,6 +156,11 @@ updateWaveTime entered config = { config | enteredWaveTime = entered }
                              
 updateGraceTime : String -> Config -> Config
 updateGraceTime entered config = { config | enteredGraceTime = entered }
+
+updateNotificationPermission : Bool -> Config -> Config
+updateNotificationPermission perm config = 
+    { config | notificationsPermitted = perm }
+
 
 cycleRemainingMode : Config -> Config
 cycleRemainingMode config =
@@ -230,6 +239,7 @@ initConfig settings =
     , twelveHour = settings.twelveHour
     , notifyOnWave = settings.notifyOnWave
     , remainingMode = settings.remainingMode
+    , notificationsPermitted = False
     , enteredWaveTime = millisToHMSShort settings.waveTime
     , enteredGraceTime = millisToHMSShort settings.graceTime
     }
@@ -271,6 +281,7 @@ type Msg
   | ConfigSetGraceTime
   | ConfigSetTwelveHour Bool
   | ConfigSetNotifyOnWave Bool
+  | ConfigNotificationPermission Bool
   | ConfigCycleRemaining
 
 checkTimers : Model -> (Model, Cmd Msg)
@@ -372,6 +383,11 @@ update msg model =
     ConfigUpdateGraceTime newGraceTime ->
       ( { model | config = updateGraceTime newGraceTime model.config }
       , Cmd.none)
+
+    ConfigNotificationPermission newNotificationPermission ->
+      ( { model | config = updateNotificationPermission newNotificationPermission model.config }
+      , Cmd.none)
+
        
     ConfigSetWaveTime ->
         let config = model.config in
@@ -408,8 +424,14 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-  Time.every 250 Tick
+subscriptions model = 
+    Sub.batch [ Time.every 250 Tick
+              , notificationPermission 
+                    (\json -> 
+                         ConfigNotificationPermission
+                           (Result.withDefault False 
+                                (Json.Decode.decodeValue Json.Decode.bool json)))
+              ]
 
 
 -- VIEW
@@ -655,10 +677,11 @@ viewConfig config =
                     , type_ "checkbox"
                     , checked config.notifyOnWave
                     , onCheck ConfigSetNotifyOnWave
+                    , disabled (not config.notificationsPermitted)
                     ]
                   []
             , label [ for "config-notify-on-wave" ]
-                [ text "Notify when it's time for a visit" ]
+                [ text "Notify me when it's time for a visit" ]
             ]
         ]
 

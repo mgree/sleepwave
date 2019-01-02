@@ -28,6 +28,12 @@
           document.execCommand('copy');
       });
 
+      if ('Notification' in window) {
+        Notification.requestPermission(function (permission) {
+          app.ports.notificationPermission.send(permission === 'granted');
+        });
+      }
+
       app.ports.notify.subscribe(function (msg) {
         if (!'Notification' in window) {
           alert(msg);
