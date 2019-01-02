@@ -5,8 +5,6 @@ port module Main exposing (..)
 
    'delay wave' with grace time?
 
-   use browser notifications
-     https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API
    wave moving across the screen
 -}
 
