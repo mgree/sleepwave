@@ -105,6 +105,17 @@ table.log {
     width: 100%;
 }
 
+div.footer {
+    padding-top: 5vh;
+    font-size: 50%;
+    font-style: italic;
+    text-align: center; 
+}
+
+div.footer a {
+    text-decoration: none;
+}
+
 /* utility classes */
 
 .u-clear-bottom {
