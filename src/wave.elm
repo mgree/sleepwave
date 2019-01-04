@@ -19,7 +19,7 @@ import Time
 import File.Download
 
 import Json.Encode
-import Json.Decode exposing (field)
+import Json.Decode
 
 import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 
@@ -164,6 +164,9 @@ cycleRemainingMode : Config -> Config
 cycleRemainingMode config =
     { config | remainingMode = nextRemainingMode config.remainingMode }
 
+fieldWithDefault fieldName decoder default =
+    Json.Decode.oneOf [Json.Decode.field fieldName decoder, Json.Decode.succeed default]
+
 settingsDecoder : Json.Decode.Decoder Settings
 settingsDecoder =
     Json.Decode.map5
@@ -174,11 +177,11 @@ settingsDecoder =
              , notifyOnWave = notifyOnWave
              , remainingMode = remainingMode
              })
-        (field "waveTime" Json.Decode.int)
-        (field "graceTime" Json.Decode.int)
-        (field "twelveHour" Json.Decode.bool)
-        (field "notifyOnWave" Json.Decode.bool)
-        (field "remainingMode" remainingModeDecoder)
+        (fieldWithDefault "waveTime" Json.Decode.int defaultSettings.waveTime)
+        (fieldWithDefault "graceTime" Json.Decode.int defaultSettings.graceTime)
+        (fieldWithDefault "twelveHour" Json.Decode.bool defaultSettings.twelveHour)
+        (fieldWithDefault "notifyOnWave" Json.Decode.bool defaultSettings.notifyOnWave)
+        (fieldWithDefault "remainingMode" remainingModeDecoder defaultSettings.remainingMode)
 
 settingsEncoder : Settings -> Json.Encode.Value
 settingsEncoder settings =
