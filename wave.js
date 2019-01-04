@@ -4756,7 +4756,7 @@ var elm$core$Array$toList = function (array) {
 	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
 var elm$core$Basics$mul = _Basics_mul;
-var author$project$Main$defaultSettings = {l: 1000 * 30, q: true, r: 0, m: true, k: (1000 * 60) * 5};
+var author$project$Main$defaultSettings = {l: 1000 * 30, o: true, p: 0, m: true, k: (1000 * 60) * 5};
 var elm$core$Basics$idiv = _Basics_idiv;
 var elm$core$Basics$modBy = _Basics_modBy;
 var author$project$Main$millisToHMS = function (millis) {
@@ -4957,15 +4957,13 @@ var author$project$Main$initConfig = function (settings) {
 		I: author$project$Main$millisToHMSShort(settings.k),
 		l: settings.l,
 		Y: false,
-		q: settings.q,
-		r: settings.r,
+		o: settings.o,
+		p: settings.p,
 		m: settings.m,
 		k: settings.k,
 		w: elm$time$Time$utc
 	};
 };
-var author$project$Main$ClockOnly = 1;
-var author$project$Main$TimeLeftOnly = 2;
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
 	function (a, b, c, d) {
@@ -5308,10 +5306,23 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 			}
 		}
 	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$oneOf = _Json_oneOf;
+var elm$json$Json$Decode$succeed = _Json_succeed;
+var author$project$Main$fieldWithDefault = F3(
+	function (fieldName, decoder, _default) {
+		return elm$json$Json$Decode$oneOf(
+			_List_fromArray(
+				[
+					A2(elm$json$Json$Decode$field, fieldName, decoder),
+					elm$json$Json$Decode$succeed(_default)
+				]));
+	});
+var author$project$Main$ClockOnly = 1;
+var author$project$Main$TimeLeftOnly = 2;
 var elm$json$Json$Decode$andThen = _Json_andThen;
 var elm$json$Json$Decode$fail = _Json_fail;
 var elm$json$Json$Decode$string = _Json_decodeString;
-var elm$json$Json$Decode$succeed = _Json_succeed;
 var author$project$Main$remainingModeDecoder = A2(
 	elm$json$Json$Decode$andThen,
 	function (s) {
@@ -5328,20 +5339,19 @@ var author$project$Main$remainingModeDecoder = A2(
 	},
 	elm$json$Json$Decode$string);
 var elm$json$Json$Decode$bool = _Json_decodeBool;
-var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$int = _Json_decodeInt;
 var elm$json$Json$Decode$map5 = _Json_map5;
 var author$project$Main$settingsDecoder = A6(
 	elm$json$Json$Decode$map5,
 	F5(
 		function (waveTime, graceTime, twelveHour, notifyOnWave, remainingMode) {
-			return {l: graceTime, q: notifyOnWave, r: remainingMode, m: twelveHour, k: waveTime};
+			return {l: graceTime, o: notifyOnWave, p: remainingMode, m: twelveHour, k: waveTime};
 		}),
-	A2(elm$json$Json$Decode$field, 'waveTime', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'graceTime', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'twelveHour', elm$json$Json$Decode$bool),
-	A2(elm$json$Json$Decode$field, 'notifyOnWave', elm$json$Json$Decode$bool),
-	A2(elm$json$Json$Decode$field, 'remainingMode', author$project$Main$remainingModeDecoder));
+	A3(author$project$Main$fieldWithDefault, 'waveTime', elm$json$Json$Decode$int, author$project$Main$defaultSettings.k),
+	A3(author$project$Main$fieldWithDefault, 'graceTime', elm$json$Json$Decode$int, author$project$Main$defaultSettings.l),
+	A3(author$project$Main$fieldWithDefault, 'twelveHour', elm$json$Json$Decode$bool, author$project$Main$defaultSettings.m),
+	A3(author$project$Main$fieldWithDefault, 'notifyOnWave', elm$json$Json$Decode$bool, author$project$Main$defaultSettings.o),
+	A3(author$project$Main$fieldWithDefault, 'remainingMode', author$project$Main$remainingModeDecoder, author$project$Main$defaultSettings.p));
 var elm$core$Task$andThen = _Scheduler_andThen;
 var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$core$Task$map2 = F3(
@@ -5461,7 +5471,7 @@ var author$project$Main$init = function (localStorageSettings) {
 				}()),
 			t: _List_Nil,
 			R: 0,
-			o: author$project$Main$Loading,
+			q: author$project$Main$Loading,
 			f: elm$time$Time$millisToPosix(0),
 			E: elm$time$Time$millisToPosix(0),
 			j: elm$time$Time$millisToPosix(0)
@@ -6019,7 +6029,7 @@ var author$project$Main$timeDifference = F2(
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$checkTimers = function (model) {
-	var _n0 = model.o;
+	var _n0 = model.q;
 	switch (_n0.$) {
 		case 0:
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
@@ -6033,8 +6043,8 @@ var author$project$Main$checkTimers = function (model) {
 				model.c.k) > -1) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{o: author$project$Main$Waving, j: model.f}),
-				model.c.q ? author$project$Main$notify(
+					{q: author$project$Main$Waving, j: model.f}),
+				model.c.o ? author$project$Main$notify(
 					A2(author$project$Main$clockTime, model.c, model.j) + ' -- Time for a visit!') : elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		default:
 			var originalTime = _n0.a;
@@ -6043,7 +6053,7 @@ var author$project$Main$checkTimers = function (model) {
 				model.c.l) > -1) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{o: author$project$Main$Quiescent, j: model.f}),
+					{q: author$project$Main$Quiescent, j: model.f}),
 				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	}
 };
@@ -6062,7 +6072,7 @@ var author$project$Main$cycleRemainingMode = function (config) {
 	return _Utils_update(
 		config,
 		{
-			r: author$project$Main$nextRemainingMode(config.r)
+			p: author$project$Main$nextRemainingMode(config.p)
 		});
 };
 var author$project$Main$toTwoDigitMonth = function (month) {
@@ -6258,7 +6268,7 @@ var author$project$Main$setNotifyOnWave = F2(
 	function (newNotifyOnWave, config) {
 		return _Utils_update(
 			config,
-			{q: newNotifyOnWave});
+			{o: newNotifyOnWave});
 	});
 var author$project$Main$setTwelveHour = F2(
 	function (newTwelveHour, config) {
@@ -6740,16 +6750,16 @@ var author$project$Main$settingsEncoder = function (settings) {
 				elm$json$Json$Encode$bool(settings.m)),
 				_Utils_Tuple2(
 				'notifyOnWave',
-				elm$json$Json$Encode$bool(settings.q)),
+				elm$json$Json$Encode$bool(settings.o)),
 				_Utils_Tuple2(
 				'remainingMode',
-				author$project$Main$remainingModeEncoder(settings.r))
+				author$project$Main$remainingModeEncoder(settings.p))
 			]));
 };
 var author$project$Main$saveConfig = function (config) {
 	return author$project$Main$saveSettings(
 		author$project$Main$settingsEncoder(
-			{l: config.l, q: config.q, r: config.r, m: config.m, k: config.k}));
+			{l: config.l, o: config.o, p: config.p, m: config.m, k: config.k}));
 };
 var author$project$Main$updateAndSaveConfig = F2(
 	function (newConfig, model) {
@@ -6820,7 +6830,7 @@ var author$project$Main$update = F2(
 						author$project$Main$Began,
 						_Utils_update(
 							model,
-							{o: author$project$Main$Quiescent, E: model.f, j: model.f})),
+							{q: author$project$Main$Quiescent, E: model.f, j: model.f})),
 					elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
@@ -6831,7 +6841,7 @@ var author$project$Main$update = F2(
 							model,
 							{
 								R: model.R + A2(author$project$Main$timeDifference, model.f, model.E),
-								o: author$project$Main$Loading,
+								q: author$project$Main$Loading,
 								E: elm$time$Time$millisToPosix(0),
 								j: model.f
 							})),
@@ -6843,7 +6853,7 @@ var author$project$Main$update = F2(
 						author$project$Main$CryingStarted,
 						_Utils_update(
 							model,
-							{o: author$project$Main$BetweenWaves, j: model.f})),
+							{q: author$project$Main$BetweenWaves, j: model.f})),
 					elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
@@ -6853,7 +6863,7 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								o: author$project$Main$GracePeriod(model.j),
+								q: author$project$Main$GracePeriod(model.j),
 								j: model.f
 							})),
 					elm$core$Platform$Cmd$none);
@@ -6863,7 +6873,7 @@ var author$project$Main$update = F2(
 					author$project$Main$squashCryingStopped(
 						_Utils_update(
 							model,
-							{o: author$project$Main$BetweenWaves, j: originalTimeEntered})),
+							{q: author$project$Main$BetweenWaves, j: originalTimeEntered})),
 					elm$core$Platform$Cmd$none);
 			case 7:
 				return _Utils_Tuple2(
@@ -6872,7 +6882,7 @@ var author$project$Main$update = F2(
 						author$project$Main$Waved(model.j),
 						_Utils_update(
 							model,
-							{o: author$project$Main$BetweenWaves, j: model.f})),
+							{q: author$project$Main$BetweenWaves, j: model.f})),
 					elm$core$Platform$Cmd$none);
 			case 8:
 				return _Utils_Tuple2(
@@ -7062,7 +7072,7 @@ var author$project$Main$viewActions = function (model) {
 		return _List_fromArray(
 			[author$project$Main$centered, handler]);
 	};
-	var _n0 = model.o;
+	var _n0 = model.q;
 	switch (_n0.$) {
 		case 0:
 			return A2(
@@ -7433,7 +7443,7 @@ var author$project$Main$viewConfig = function (config) {
 							[
 								elm$html$Html$Attributes$id('config-notify-on-wave'),
 								elm$html$Html$Attributes$type_('checkbox'),
-								elm$html$Html$Attributes$checked(config.q),
+								elm$html$Html$Attributes$checked(config.o),
 								elm$html$Html$Events$onCheck(author$project$Main$ConfigSetNotifyOnWave),
 								elm$html$Html$Attributes$disabled(!config.Y)
 							]),
@@ -7803,7 +7813,7 @@ var author$project$Main$remainingTime = F2(
 								]))
 						]);
 				} else {
-					var _n0 = model.c.r;
+					var _n0 = model.c.p;
 					switch (_n0) {
 						case 0:
 							return _List_fromArray(
@@ -7826,7 +7836,7 @@ var author$project$Main$viewRemaining = function (model) {
 				elm$html$Html$Attributes$class('ten columns offset-by-one')
 			]),
 		function () {
-			var _n0 = model.o;
+			var _n0 = model.q;
 			switch (_n0.$) {
 				case 0:
 					return _List_Nil;
