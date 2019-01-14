@@ -6057,6 +6057,12 @@ var author$project$Main$checkTimers = function (model) {
 				elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	}
 };
+var elm$json$Json$Encode$null = _Json_encodeNull;
+var author$project$Main$clearNotification = _Platform_outgoingPort(
+	'clearNotification',
+	function ($) {
+		return elm$json$Json$Encode$null;
+	});
 var author$project$Main$copyToClipboard = _Platform_outgoingPort('copyToClipboard', elm$json$Json$Encode$string);
 var author$project$Main$nextRemainingMode = function (mode) {
 	switch (mode) {
@@ -6883,7 +6889,7 @@ var author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{q: author$project$Main$BetweenWaves, j: model.f})),
-					elm$core$Platform$Cmd$none);
+					author$project$Main$clearNotification(0));
 			case 8:
 				return _Utils_Tuple2(
 					model,

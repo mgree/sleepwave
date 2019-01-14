@@ -28,6 +28,8 @@ import Parser exposing (Parser, (|.), (|=), succeed, symbol, end, oneOf)
 port saveSettings : Json.Encode.Value -> Cmd msg
 port copyToClipboard : String -> Cmd msg
 port notify : String -> Cmd msg
+port clearNotification : () -> Cmd msg
+
 port notificationPermission : (Json.Encode.Value -> msg) -> Sub msg
 
 -- MAIN
@@ -364,7 +366,7 @@ update msg model =
       ( logEntry (Waved model.timeEntered)
             { model | state = BetweenWaves,
                       timeEntered = model.time }
-      , Cmd.none)
+      , clearNotification ())
 
     CopyLog ->
       ( model

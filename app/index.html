@@ -34,11 +34,19 @@
         });
       }
 
+      var n = undefined;
+      
       app.ports.notify.subscribe(function (msg) {
         if (!'Notification' in window) {
           alert(msg);
         } else if (Notification.permission === 'granted') {
-          new Notification(msg);
+          n = new Notification(msg);
+        }
+      });
+
+      app.ports.clearNotification.subscribe(function () {
+        if (n !== undefined && 'close' in n) {
+          n.close();
         }
       });
     </script>
