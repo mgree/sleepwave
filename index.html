@@ -33,17 +33,19 @@
           app.ports.notificationPermission.send(permission === 'granted');
         });
       }
-      
+
+      navigator.serviceWorker.register('sw.js');
+
       app.ports.notify.subscribe(function (msg) {
         if (!'Notification' in window) {
           alert(msg);
         } else if (Notification.permission === 'granted') {
           navigator.serviceWorker.getRegistration().then(function(reg) {
-                var options = {
-                  icon: 'favicon.ico',
-                };
-                reg.showNotification(msg, options);
-              });
+              var options = {
+                icon: 'favicon.ico',
+              };
+              reg.showNotification(msg, options);
+            });
         }
       });
 
