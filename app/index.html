@@ -33,21 +33,28 @@
           app.ports.notificationPermission.send(permission === 'granted');
         });
       }
-
-      var n = undefined;
       
       app.ports.notify.subscribe(function (msg) {
         if (!'Notification' in window) {
           alert(msg);
         } else if (Notification.permission === 'granted') {
-          n = new Notification(msg);
+          navigator.serviceWorker.getRegistration().then(function(reg) {
+                var options = {
+                  icon: 'favicon.ico',
+                };
+                reg.showNotification(msg, options);
+              });
         }
       });
 
       app.ports.clearNotification.subscribe(function () {
-        if (n !== undefined && 'close' in n) {
-          n.close();
-        }
+        navigator.serviceWorker.getRegistration().then(function(reg) {
+          reg.getNotifications().then(function (ns) {
+            for (let n of ns) {
+              n.close();
+            }
+          });
+        });
       });
     </script>
     <div class="footer">
